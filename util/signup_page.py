@@ -1,4 +1,3 @@
-
 # Signup page function
 def signup_page(st):
     st.title("Sign Up")

@@ -2,7 +2,20 @@
 # Dummy credentials for login
 DUMMY_EMAIL = "user@example.com"
 DUMMY_PASSWORD = "password123"
+
+
 def login_page(st):
+    """
+    Render the login page of the Streamlit application.
+
+    This function displays a login form where users can input their email and password.
+    It checks the input against dummy credentials and updates the session state upon
+    successful login. If the login is successful, it redirects the user to the main page.
+    Additionally, it provides an option for users to navigate to the signup page.
+
+    Args:
+        st: The Streamlit instance used to render the page elements.
+    """
     st.title("Login")
 
     with st.container():

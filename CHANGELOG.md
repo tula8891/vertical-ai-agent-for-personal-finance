@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2025-01-17
+
+### Added
+- Added flake8 exceptions for specific code patterns
+- Added pre-commit configuration improvements
+
+### Changed
+- Updated code quality settings
+- Enhanced error handling
+- Improved documentation consistency
+
+### Fixed
+- Fixed code quality issues with appropriate exceptions
+- Fixed line break warnings in streamlit app
+
 ## [1.1.0] - 2025-01-17
 
 ### Added

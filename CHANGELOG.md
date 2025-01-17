@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2025-01-17
+
+### Added
+- Added flake8 exceptions for specific code patterns (F401, F541, F841, W605, E203, E402, E501, W503)
+- Added per-file ignores for test files
+
+### Changed
+- Updated pre-commit configuration for better code quality checks
+- Increased max line length to 130 characters
+- Enhanced error handling in flake8 configuration
+
+### Fixed
+- Fixed line break warnings in streamlit app
+- Fixed code quality issues with appropriate exceptions
+
 ## [1.3.0] - 2025-01-17
 
 ### Added

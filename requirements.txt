@@ -1,0 +1,6 @@
+snowflake==1.0.0
+snowflake-ml-python==1.6.4
+snowflake.core==1.0.0
+snowflake-snowpark-python==1.26.0
+streamlit==1.41.1
+toml

@@ -5,6 +5,177 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.9] - 2025-01-17
+
+### Added
+- Added test coverage status in README.md
+- Added current status section highlighting areas for improvement
+- Added detailed test coverage metrics for all components
+
+### Changed
+- Updated documentation to reflect current test coverage (49%)
+- Enhanced README with current project status and improvements needed
+- Reorganized test structure for better maintainability
+
+### Known Issues
+- Test coverage below target threshold (Current: 49%, Target: 80%)
+- Low coverage in signup_page.py (5%)
+- Zero coverage in test files:
+  - util/test_login_page.py
+  - util/test_signup_page.py
+- Skipped test: test_snowflake_connection (requires database mock)
+
+### Required Improvements
+- Implement missing test cases for signup_page.py
+- Add database connection mocking for Snowflake tests
+- Remove or implement empty test files in util directory
+- Add integration tests for UI components
+- Increase test coverage for streamlite_app.py (currently 37%)
+- Add error handling test cases
+- Implement session state management tests
+
+## [1.6.8] - 2025-01-17
+
+### Added
+- Added automated release tagging via `make release`
+- Added version extraction from CHANGELOG.md
+- Added pre-release validation checks
+
+### Changed
+- Enhanced pre-commit integration with release process
+- Improved test coverage reporting
+- Updated Makefile help documentation
+
+### Security
+- Added git working directory check before release
+- Added version tag collision prevention
+
+## [1.6.7] - 2025-01-17
+
+### Added
+- Added comprehensive pre-commit command to Makefile
+- Added combined code quality checks in pre-commit
+- Added test coverage checks to pre-commit
+
+### Changed
+- Enhanced clean command to handle more cache types
+- Improved Makefile help documentation
+- Streamlined pre-commit workflow
+
+## [1.6.6] - 2025-01-17
+
+### Changed
+- Enhanced signup form validation with email checks
+- Improved error messaging in signup process
+- Optimized session state management
+
+### Fixed
+- Fixed unused session variable in streamlite_app.py
+- Fixed unused email variable in signup_page.py
+- Fixed form validation logic in signup page
+
+## [1.6.5] - 2025-01-17
+
+### Changed
+- Simplified Makefile commands for better usability
+- Streamlined flake8 configuration
+- Removed redundant lint commands
+- Enhanced clean command for better cleanup
+
+### Removed
+- Removed lint-full command (merged into lint)
+- Removed redundant pre-commit commands
+- Removed unnecessary configuration complexity
+
+## [1.6.4] - 2025-01-17
+
+### Added
+- Added `mypy.ini` configuration for type checking
+- Added `.bandit` configuration for security checks
+- Added explicit source directories in Makefile
+
+### Changed
+- Optimized `make lint` to only check source files
+- Enhanced `make lint-full` with better output and focused checks
+- Updated linting configurations for better performance
+- Improved error messages and progress indicators
+
+## [1.6.3] - 2025-01-17
+
+### Added
+- Added `lint-full` command for comprehensive linting
+
+### Changed
+- Simplified `make lint` to focus on essential flake8 checks
+- Moved mypy and bandit checks to `lint-full` command
+- Updated help documentation for lint commands
+
+## [1.6.2] - 2025-01-17
+
+### Added
+- Added comprehensive `.flake8` configuration file
+  - Set max line length to 130
+  - Configured plugin-specific settings
+  - Added per-file-ignores for tests
+  - Added docstring convention settings
+  - Set maximum complexity threshold
+
+### Changed
+- Updated documentation to reference flake8 configuration
+- Enhanced code quality requirements section
+
+## [1.6.1] - 2025-01-17
+
+### Added
+- Added comprehensive test documentation
+- Added version compatibility matrix
+- Added test fixtures documentation
+- Added code quality requirements
+
+### Changed
+- Updated requirements.txt to remove unused packages
+- Improved documentation organization
+- Enhanced test implementation details
+
+### Removed
+- Removed unittest-xml-reporting package
+- Removed outdated test references
+
+## [1.6.0] - 2025-01-17
+
+### Added
+- Added pytest-html for HTML test reports
+- Added HTML report generation to test commands
+- Added separate HTML reports for test results and coverage
+
+### Changed
+- Updated pytest.ini with HTML report configuration
+- Updated Makefile test commands to generate HTML reports
+- Improved test report organization with separate directories
+- Enhanced documentation for test reports
+
+## [1.5.0] - 2025-01-17
+
+### Added
+- Migrated to pytest testing framework
+- Added pytest.ini configuration
+- Added new test directory structure
+- Added coverage reporting with pytest-cov
+- Added UI component tests with Streamlit mocking
+- Added utility function tests
+- Added session state management tests
+
+### Changed
+- Moved test files to tests/ directory
+- Updated Makefile with new test commands
+- Enhanced test documentation in README.md
+- Improved test organization and structure
+
+### Removed
+- Removed unittest framework
+- Removed HTMLTestRunner dependency
+- Removed old test file organization
+
 ## [1.4.0] - 2025-01-17
 
 ### Added

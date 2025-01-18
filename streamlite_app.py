@@ -15,61 +15,31 @@ MODELS = [
     "llama3.1-8b",
 ]
 
-# Custom CSS for minimalist, professional look
+# Configure Streamlit page settings
+st.set_page_config(
+    page_title="Finance App",
+    page_icon="💰",
+    layout="centered",  # Using centered layout for better form display
+    initial_sidebar_state="expanded",
+)
+
+# Use Streamlit's built-in theme configuration
 st.markdown(
     """
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f7f7f7;
-            margin: 0;
-            padding: 0;
-        }
-        .login-container {
-            background: white;
-            padding: 30px 40px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        /* Minimal custom styling */
+        .stButton>button {
             width: 100%;
-            max-width: 400px;
-            margin: 0 auto;
-            text-align: center;
+            margin-top: 1rem;
         }
-        .login-container h2 {
-            margin-bottom: 20px;
-            font-size: 22px;
-            color: #333;
+        .stForm {
+            padding: 1rem;
+            border-radius: 0.5rem;
         }
-        .login-container input {
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            font-size: 16px;
-        }
-        .login-container button {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        .login-container button:hover {
-            background-color: #45a049;
-        }
-        .signup-link {
-            color: #007bff;
-            font-size: 14px;
-            text-decoration: none;
-        }
-        .signup-link:hover {
-            text-decoration: underline;
-        }
+        /* Hide Streamlit branding */
+        #MainMenu {visibility: hidden;}
+        footer {visibility: hidden;}
+        header {visibility: hidden;}
     </style>
 """,
     unsafe_allow_html=True,
@@ -104,26 +74,99 @@ def initialize_session():
 # Main page function
 def main_page():
     """
-    Render the main page of the Streamlit application.
-
-    This function sets up the main page interface, initializes the Snowflake session,
+    Main page of the Streamlit application that displays the chat interface,
     manages user login/logout, and handles chat interactions with the Snowflake Cortex.
     It also initializes session state variables and displays chat messages from history.
     """
-    st.title(f":speech_balloon: Welcome to EconoGenie: Your Personal Finance Bro")
+    # Add navigation bar with improved spacing
+    nav_col1, nav_col2, nav_col3 = st.columns([6, 2, 2])
+    with nav_col1:
+        st.title("Econo Genie")
+        st.caption("Personal Finance BRO")
+    with nav_col3:
+        if st.button("🚪 Logout", type="secondary", use_container_width=True):
+            st.session_state.clear()
+            st.session_state.page = "login"
+            st.rerun()
+
+    st.markdown("---")
+
+    # Add profile section with improved spacing
+    with st.expander("Your Investment Profile", expanded=True):
+        st.markdown(
+            """
+            <style>
+                div[data-testid="stExpander"] div[role="button"] p {
+                    font-size: 1.1rem;
+                    margin-bottom: 0.5rem;
+                }
+                div.row-widget.stRadio > div {
+                    flex-direction: column;
+                    gap: 0.5rem;
+                }
+                div.row-widget.stMultiSelect > div {
+                    margin-top: 0.5rem;
+                }
+            </style>
+        """,
+            unsafe_allow_html=True,
+        )
+
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            st.markdown("##### Risk Profile")
+            st.write("")  # Add spacing
+            risk_profile = st.radio(
+                "Select your risk tolerance",
+                ["Conservative", "Moderate", "Moderately Aggressive"],
+                label_visibility="collapsed",
+            )
+
+        with col2:
+            st.markdown("##### Financial Goals")
+            st.write("")  # Add spacing
+            goals = st.multiselect(
+                "Choose your financial goals",
+                [
+                    "House Down Payment",
+                    "Retirement",
+                    "Education",
+                    "Emergency Fund",
+                    "Wealth Building",
+                ],
+                default=["Retirement"],
+                label_visibility="collapsed",
+            )
+
+        with col3:
+            st.markdown("##### Investment Horizon")
+            st.write("")  # Add spacing
+            horizon = st.radio(
+                "Select your investment timeline",
+                [
+                    "Short-term (1-3 years)",
+                    "Medium-term (3-7 years)",
+                    "Long-term (7+ years)",
+                ],
+                label_visibility="collapsed",
+            )
+
+        # Save preferences to session state
+        if "risk_profile" not in st.session_state:
+            st.session_state.risk_profile = risk_profile
+        if "financial_goals" not in st.session_state:
+            st.session_state.financial_goals = goals
+        if "investment_horizon" not in st.session_state:
+            st.session_state.investment_horizon = horizon
+
+    st.markdown("---")
 
     # Ensure the Snowflake session is initialized
-    session = initialize_session()
+    initialize_session()
 
     # Display a welcome message
     st.write("Welcome to the main page!")
-
-    # Logout button
-    if st.button("Logout"):
-        # Set the logged_in state to False and redirect to the login page
-        st.session_state.logged_in = False
-        st.session_state.page = "login"
-        st.success("Logged out successfully!")
 
     # Initialize session state variables if not set
     init_service_metadata()

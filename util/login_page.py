@@ -5,37 +5,34 @@ DUMMY_PASSWORD = "password123"
 
 
 def login_page(st):
-    """
-    Render the login page of the Streamlit application.
+    """Render the login page of the Streamlit application."""
 
-    This function displays a login form where users can input their email and password.
-    It checks the input against dummy credentials and updates the session state upon
-    successful login. If the login is successful, it redirects the user to the main page.
-    Additionally, it provides an option for users to navigate to the signup page.
+    # Center-aligned container
+    col1, col2, col3 = st.columns([1, 2, 1])
 
-    Args:
-        st: The Streamlit instance used to render the page elements.
-    """
-    st.title("Login")
+    with col2:
+        st.title("Login")
+        st.write("Welcome back! Please log in to continue.")
 
-    with st.container():
-        with st.form(key="login_form"):
-            st.subheader("Please log in to continue")
+        # Login form
+        with st.form("login_form", clear_on_submit=True):
+            email = st.text_input("Email", placeholder="Enter your email")
+            password = st.text_input(
+                "Password", type="password", placeholder="Enter your password"
+            )
 
-            email = st.text_input("Email")
-            password = st.text_input("Password", type="password")
-
-            submit_button = st.form_submit_button("Login")
-
-            if submit_button:
+            # Full-width login button
+            if st.form_submit_button("Login", use_container_width=True):
                 if email == DUMMY_EMAIL and password == DUMMY_PASSWORD:
                     st.session_state.logged_in = True
-                    st.session_state.user_email = email
-                    st.session_state.page = "main"  # Redirect to the main page
+                    st.session_state.username = "Demo User"
+                    st.session_state.email = email
+                    st.session_state.page = "main"
                     st.success("Login successful!")
                 else:
                     st.error("Invalid credentials. Please try again.")
 
-        # Redirect to signup page if user doesn't have an account
-        if st.button("Don't have an account? Sign Up"):
+        # Sign up link
+        st.write("Don't have an account?")
+        if st.button("Sign Up", use_container_width=True):
             st.session_state.page = "signup"

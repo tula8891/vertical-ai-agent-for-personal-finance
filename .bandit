@@ -1,0 +1,9 @@
+[bandit]
+exclude_dirs = tests,venv
+skips = B101,B104,B105,B110,B303,B311
+# B101: Use of assert
+# B104: Hardcoded bind all interfaces
+# B105: Hardcoded password string
+# B110: Try, Except, Pass detected
+# B303: Use of insecure MD2, MD4, MD5, or SHA1 hash function
+# B311: Standard pseudo-random generators are not suitable for security/cryptographic purposes

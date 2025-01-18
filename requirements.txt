@@ -4,7 +4,6 @@ snowflake.core==1.0.0
 snowflake-snowpark-python==1.26.0
 streamlit==1.41.1
 toml==0.10.2
-unittest-xml-reporting==3.2.0
 pre-commit==3.6.0
 black==23.12.1
 flake8==7.0.0
@@ -16,6 +15,9 @@ isort==5.13.2
 mypy==1.8.0
 bandit==1.7.6
 types-toml==0.10.8.7
-requests>=2.31.0
-types-requests==2.31.0.20240106
+requests>=2.31.0,<3.0.0
+urllib3>=1.21.1,<2.0.0
 types-setuptools==69.0.0.20240115
+pytest==8.0.0
+pytest-cov==4.1.0
+pytest-html==4.1.1

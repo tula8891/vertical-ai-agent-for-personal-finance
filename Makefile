@@ -15,7 +15,7 @@ COVERAGE_DIR := $(TEST_REPORTS_DIR)/coverage
 SRC_DIRS := streamlite_app.py util tests
 
 # Version extraction from CHANGELOG.md
-VERSION = 0.0.1
+VERSION = 1.6.9
 
 # Default target
 help:

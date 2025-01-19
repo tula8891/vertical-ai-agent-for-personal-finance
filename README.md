@@ -5,9 +5,22 @@ Demo_app is a Streamlit application that integrates with Snowflake Cortex to pro
 
 ## Features
 - **Modern Landing Page**:
-  - Clean and intuitive navigation
-  - Sections for Investment Recommendations, Financial Literacy, and AI Agents
+  - Clean and intuitive navigation with sidebar menu
+  - Section-specific content areas with emoji icons:
+    - 📚 Financial Literacy
+    - 💰 Investment Recommendations
+    - 🤖 AI Agents
+  - Quick access navigation menu
   - Responsive design with consistent styling
+  - Enhanced button design and alignment
+  - Optimized content organization
+- **User Interface**:
+  - Sidebar navigation with quick access to all features
+  - Consistent color scheme across components
+  - Modern button styling with hover effects
+  - Responsive layout for all screen sizes
+  - Enhanced spacing and component alignment
+  - Custom font settings for improved readability
 - **User Authentication**:
   - Secure login and signup functionality
   - Enhanced email validation and password confirmation
@@ -88,15 +101,28 @@ Demo_app/
 
 ### Available Commands
 ```bash
-make setup         # Install dependencies and pre-commit hooks
-make run          # Run Streamlit app
+# Development
+make setup         # Install dependencies and set up development environment
+make run          # Run Streamlit application locally
+
+# Code Quality
 make format       # Format code with black and isort
-make lint         # Run linting checks
-make test         # Run tests with HTML report
+make lint         # Run flake8 code quality checks
+make pre-commit   # Run all pre-commit checks (format, lint, test)
+
+# Testing
+make test         # Run tests with HTML and XML reports
 make test-coverage # Run tests with coverage report
+
+# Release
+make get-version  # Get next version number based on git tags
+make release      # Create and push a new release (VERSION=x.y.z optional)
+
+# Maintenance
 make clean        # Clean up cache files and test reports
-make pre-commit   # Run all pre-commit checks
-make release      # Create a new release tag
+
+# Help
+make help         # Show all available commands with descriptions
 ```
 
 ### Code Quality Tools

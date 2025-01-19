@@ -5,6 +5,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.1] - 2025-01-18
+
+### Added
+- New sidebar navigation with emoji icons
+- Section-specific content areas for Financial Literacy, Investment, and AI Agents
+- Quick access navigation menu
+- Enhanced user interface components
+- Improved responsive design elements
+- Automated version management in release process
+- New `get-version` command for semantic versioning
+- Enhanced help documentation with categorized commands
+- Improved error handling in release process
+
+### Changed
+- Reorganized main page layout for better user experience
+- Updated button styling for consistency
+- Enhanced color scheme implementation
+- Improved navigation flow between sections
+- Optimized content area organization
+- Reorganized Makefile commands into logical categories
+- Enhanced pre-commit checks with better error reporting
+- Updated release process to prevent failures
+- Improved command descriptions in help output
+
+### Fixed
+- Button alignment and sizing issues
+- Navigation state persistence
+- UI component spacing
+- Color consistency across components
+- Release process now properly handles pre-commit failures
+- Better error messages for git operations
+- Release versioning consistency
+- Command documentation accuracy
+
 ## [1.7.0] - 2025-01-18
 
 ### Added

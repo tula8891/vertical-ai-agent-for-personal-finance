@@ -78,6 +78,40 @@ def main_page():
     manages user login/logout, and handles chat interactions with the Snowflake Cortex.
     It also initializes session state variables and displays chat messages from history.
     """
+    # Custom CSS for sidebar
+    st.markdown(
+        """
+        <style>
+        .sidebar-button {
+            background-color: #4B8BBE;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.5rem 1rem;
+            margin: 0.5rem 0;
+            width: 100%;
+            text-align: left;
+        }
+        .sidebar .stButton>button {
+            background-color: #4B8BBE;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            width: 100%;
+            margin: 4px 0;
+            text-align: left;
+            font-size: 16px;
+        }
+        .sidebar .stButton>button:hover {
+            background-color: #3D7BA8;
+            border: none;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
     # Add navigation bar with improved spacing
     nav_col1, nav_col2, nav_col3 = st.columns([6, 2, 2])
     with nav_col1:
@@ -161,6 +195,91 @@ def main_page():
             st.session_state.investment_horizon = horizon
 
     st.markdown("---")
+
+    # Add sidebar
+    with st.sidebar:
+        st.title("EconoGenie")
+        st.markdown("### Personal Finance App")
+
+        st.markdown("---")
+
+        if st.button(
+            "📚 Financial Literacy", use_container_width=True, key="sidebar_fin_lit"
+        ):
+            st.session_state.current_section = "financial_literacy"
+            st.rerun()
+
+        if st.button(
+            "💰 Personalized Investment", use_container_width=True, key="sidebar_invest"
+        ):
+            st.session_state.current_section = "investment"
+            st.rerun()
+
+        if st.button("🤖 AI Agents [Beta]", use_container_width=True, key="sidebar_ai"):
+            st.session_state.current_section = "ai_agents"
+            st.rerun()
+
+        st.markdown("---")
+
+        # Add logout button at the bottom of sidebar
+        st.markdown(
+            """
+            <style>
+            [data-testid="stSidebarNav"] {
+                background-image: linear-gradient(#4B8BBE, #3D7BA8);
+                color: white;
+                padding: 1rem;
+                margin-top: auto;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
+        if st.button("🚪 Logout", key="sidebar_logout"):
+            st.session_state.logged_in = False
+            st.session_state.page = "landing"
+            st.rerun()
+
+    # Initialize session state for current section if not exists
+    if "current_section" not in st.session_state:
+        st.session_state.current_section = "financial_literacy"
+
+    # Main content area
+    if st.session_state.current_section == "financial_literacy":
+        st.header("📚 Financial Literacy")
+        st.markdown(
+            """
+        Welcome to your financial education hub! Here you can:
+        - Take financial literacy assessments
+        - Track your learning progress
+        - Get personalized learning recommendations
+        - Access educational resources
+        """
+        )
+
+    elif st.session_state.current_section == "investment":
+        st.header("💰 Personalized Investment Recommendations")
+        st.markdown(
+            """
+        Get tailored investment advice based on your profile:
+        - Risk assessment
+        - Portfolio analysis
+        - Investment suggestions
+        - Market insights
+        """
+        )
+
+    elif st.session_state.current_section == "ai_agents":
+        st.header("🤖 AI Agents [Beta]")
+        st.markdown(
+            """
+        Your AI-powered financial assistant:
+        - Smart financial planning
+        - Automated insights
+        - Personalized recommendations
+        - Real-time assistance
+        """
+        )
 
     # Ensure the Snowflake session is initialized
     initialize_session()

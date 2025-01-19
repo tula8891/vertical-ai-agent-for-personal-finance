@@ -1,4 +1,4 @@
-.PHONY: help setup run format clean test test-coverage lint pre-commit release
+.PHONY: help setup run format clean test test-coverage lint pre-commit release get-version
 
 # Python settings
 PYTHON := venv/bin/python
@@ -14,21 +14,31 @@ COVERAGE_DIR := $(TEST_REPORTS_DIR)/coverage
 # Source directories
 SRC_DIRS := streamlite_app.py util tests
 
-# Version extraction from CHANGELOG.md
-VERSION = 1.6.9
-
 # Default target
 help:
-	@echo "Available commands:"
-	@echo "  make setup         - Install dependencies"
-	@echo "  make run          - Run Streamlit app"
+	@echo "Demo_app Makefile Commands:"
+	@echo ""
+	@echo "Development Commands:"
+	@echo "  make setup         - Install dependencies and set up development environment"
+	@echo "  make run          - Run Streamlit application locally"
+	@echo ""
+	@echo "Code Quality Commands:"
 	@echo "  make format       - Format code with black and isort"
-	@echo "  make lint         - Run code quality checks"
-	@echo "  make test         - Run tests"
-	@echo "  make test-coverage - Run tests with coverage"
-	@echo "  make clean        - Clean up cache files"
-	@echo "  make pre-commit   - Run all pre-commit checks"
-	@echo "  make release      - Create a new release tag"
+	@echo "  make lint         - Run flake8 code quality checks"
+	@echo "  make pre-commit   - Run all pre-commit checks (format, lint, test)"
+	@echo ""
+	@echo "Testing Commands:"
+	@echo "  make test         - Run tests with HTML and XML reports"
+	@echo "  make test-coverage - Run tests with coverage report"
+	@echo ""
+	@echo "Release Commands:"
+	@echo "  make get-version  - Get next version number based on git tags"
+	@echo "  make release      - Create and push a new release (VERSION=x.y.z optional)"
+	@echo ""
+	@echo "Maintenance Commands:"
+	@echo "  make clean        - Clean up cache files and test reports"
+	@echo ""
+	@echo "Example: make release VERSION=1.7.1  # Create release with specific version"
 
 # Setup development environment
 setup:
@@ -83,12 +93,42 @@ pre-commit:
 	@make test-coverage
 	@echo "\nPre-commit checks completed!"
 
+# Run pre-commit checks and return status
+check-release:
+	@echo "Running pre-commit checks..."
+	@make pre-commit > /dev/null 2>&1 && echo "success" || echo "failed"
+
+# Get the latest version tag and increment it
+get-version:
+	@if [ -z "$(VERSION)" ]; then \
+		LATEST_TAG=$$(git describe --tags `git rev-list --tags --max-count=1` 2>/dev/null || echo "v0.0.0"); \
+		MAJOR=$$(echo $$LATEST_TAG | cut -d. -f1 | tr -d 'v'); \
+		MINOR=$$(echo $$LATEST_TAG | cut -d. -f2); \
+		PATCH=$$(echo $$LATEST_TAG | cut -d. -f3); \
+		NEW_PATCH=$$((PATCH + 1)); \
+		echo "$$MAJOR.$$MINOR.$$NEW_PATCH"; \
+	else \
+		echo "$(VERSION)"; \
+	fi
+
 # Create release tag
 release:
-	@echo "Creating release v$(VERSION)..."
-	@make pre-commit || { echo "Pre-commit checks failed. Fix issues before releasing."; exit 1; }
-	@git tag v$(VERSION)
-	@echo "Release v$(VERSION) created!"
-	@echo "Pushing release to origin..."
-	@git push origin v$(VERSION)
-	@echo "Release pushed to origin!"
+	@echo "Determining version number..."
+	$(eval NEW_VERSION := $(shell $(MAKE) get-version))
+	@echo "Creating release v$(NEW_VERSION)..."
+	$(eval CHECK_RESULT := $(shell $(MAKE) check-release))
+	@if [ "$(CHECK_RESULT)" = "failed" ]; then \
+		echo " Pre-commit checks failed. Please fix the issues before releasing."; \
+		exit 1; \
+	fi
+	@echo " Pre-commit checks passed!"
+	@echo "Committing changes..."
+	@git add .
+	@git commit -m "Release v$(NEW_VERSION)" || true
+	@echo "Pushing code changes..."
+	@git push origin main || { echo " Failed to push code changes. Please resolve any conflicts and try again."; exit 1; }
+	@git tag v$(NEW_VERSION) || { echo " Failed to create tag. Tag might already exist."; exit 1; }
+	@echo "Release v$(NEW_VERSION) created!"
+	@echo "Pushing release tag to origin..."
+	@git push origin v$(NEW_VERSION) || { echo " Failed to push tag. Please check remote permissions."; exit 1; }
+	@echo " Release v$(NEW_VERSION) completed successfully!"

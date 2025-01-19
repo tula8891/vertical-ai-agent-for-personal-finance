@@ -96,7 +96,34 @@ pre-commit:
 # Run pre-commit checks and return status
 check-release:
 	@echo "Running pre-commit checks..."
-	@make pre-commit > /dev/null 2>&1 && echo "success" || echo "failed"
+	@make pre-commit > /dev/null 2>&1 && echo "success" || ( \
+		echo "failed"; \
+		echo "\n❌ Pre-commit checks failed. Here are the details:"; \
+		make pre-commit; \
+		exit 1 \
+	)
+
+# Create release tag
+release:
+	@echo "Determining version number..."
+	$(eval NEW_VERSION := $(shell $(MAKE) get-version))
+	@echo "Creating release v$(NEW_VERSION)..."
+	$(eval CHECK_RESULT := $(shell $(MAKE) check-release))
+	@if [ "$(CHECK_RESULT)" = "failed" ]; then \
+		echo "❌ Release aborted due to pre-commit check failures."; \
+		exit 1; \
+	fi
+	@echo "✅ Pre-commit checks passed!"
+	@echo "Committing changes..."
+	@git add .
+	@git commit -m "Release v$(NEW_VERSION)" || true
+	@echo "Pushing code changes..."
+	@git push origin main || { echo "❌ Failed to push code changes. Please resolve any conflicts and try again."; exit 1; }
+	@git tag v$(NEW_VERSION) || { echo "❌ Failed to create tag. Tag might already exist."; exit 1; }
+	@echo "Release v$(NEW_VERSION) created!"
+	@echo "Pushing release tag to origin..."
+	@git push origin v$(NEW_VERSION) || { echo "❌ Failed to push tag. Please check remote permissions."; exit 1; }
+	@echo "✅ Release v$(NEW_VERSION) completed successfully!"
 
 # Get the latest version tag and increment it
 get-version:
@@ -110,25 +137,3 @@ get-version:
 	else \
 		echo "$(VERSION)"; \
 	fi
-
-# Create release tag
-release:
-	@echo "Determining version number..."
-	$(eval NEW_VERSION := $(shell $(MAKE) get-version))
-	@echo "Creating release v$(NEW_VERSION)..."
-	$(eval CHECK_RESULT := $(shell $(MAKE) check-release))
-	@if [ "$(CHECK_RESULT)" = "failed" ]; then \
-		echo " Pre-commit checks failed. Please fix the issues before releasing."; \
-		exit 1; \
-	fi
-	@echo " Pre-commit checks passed!"
-	@echo "Committing changes..."
-	@git add .
-	@git commit -m "Release v$(NEW_VERSION)" || true
-	@echo "Pushing code changes..."
-	@git push origin main || { echo " Failed to push code changes. Please resolve any conflicts and try again."; exit 1; }
-	@git tag v$(NEW_VERSION) || { echo " Failed to create tag. Tag might already exist."; exit 1; }
-	@echo "Release v$(NEW_VERSION) created!"
-	@echo "Pushing release tag to origin..."
-	@git push origin v$(NEW_VERSION) || { echo " Failed to push tag. Please check remote permissions."; exit 1; }
-	@echo " Release v$(NEW_VERSION) completed successfully!"

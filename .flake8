@@ -20,7 +20,7 @@ exclude =
 
 # Essential errors only
 select = E,F,W,B,B950
-ignore = E203,W503,E402,E501,F401,W605,B006
+ignore = E203,W503,E402,E501,F401,W605,B006,W293
 
 # Per-file-ignores
 per-file-ignores =

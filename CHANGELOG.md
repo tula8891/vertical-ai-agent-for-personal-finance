@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2025-01-18
+
+### Added
+- New landing page with improved UI/UX
+- Streamlit theme configuration in `.streamlit/config.toml`
+- Navigation bar with Home, Login, and Sign Up buttons
+- Sections for Personalized Investment Recommendations, Financial Literacy, and AI Agents
+- Unique button keys to prevent duplicate ID errors
+
+### Changed
+- Updated main page layout to be more user-friendly
+- Improved button styling and color consistency
+- Enhanced navigation flow between pages
+- Updated flake8 configuration for better code quality
+- Reorganized code structure for better maintainability
+
+### Fixed
+- Resolved duplicate button ID errors in navigation
+- Fixed styling inconsistencies in UI components
+
 ## [1.6.9] - 2025-01-17
 
 ### Added

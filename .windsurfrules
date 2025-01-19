@@ -1,0 +1,10 @@
+1. use Makefile to build the package
+2. use streamlit for UI development
+3. use snowflake for data source
+4. use Cortex for semantic search
+5. use chat history for context management
+6. use advanced options for configuration
+7. update readme and changelog before release
+8. Add test cases under test
+9. Add test cases for UI components
+10. Add test cases for new features

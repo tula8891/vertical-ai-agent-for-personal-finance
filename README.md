@@ -1,9 +1,13 @@
 # Demo_app
 
 ## Overview
-Demo_app is a Streamlit application that integrates with Snowflake Cortex to provide an interactive chatbot experience. It allows users to log in, interact with the chatbot, and perform queries using Snowflake's powerful data processing capabilities.
+Demo_app is a Streamlit application that integrates with Snowflake Cortex to provide an interactive chatbot experience. It features a modern landing page, user authentication, and AI-powered financial assistance.
 
 ## Features
+- **Modern Landing Page**:
+  - Clean and intuitive navigation
+  - Sections for Investment Recommendations, Financial Literacy, and AI Agents
+  - Responsive design with consistent styling
 - **User Authentication**:
   - Secure login and signup functionality
   - Enhanced email validation and password confirmation
@@ -16,13 +20,19 @@ Demo_app is a Streamlit application that integrates with Snowflake Cortex to pro
   - llama3.1-8b
 - **Advanced Search**: Semantic search capabilities using Snowflake Cortex with configurable columns and filters
 - **Chat History**: Intelligent context management with configurable history length
-- **Customizable Interface**: Clean, minimalist UI with configurable options
-- **Session Management**: Efficient session handling with Snowflake
+- **Theme Configuration**: Customizable UI theme through `.streamlit/config.toml`:
+  - Primary color: #4B8BBE
+  - Background color: #F0F2F6
+  - Secondary background: #FFFFFF
+  - Text color: #31333F
+  - Custom font settings
 
 ## Project Structure
 ```
 Demo_app/
 ├── .streamlit/          # Streamlit configuration
+│   ├── config.toml     # Theme and layout settings
+│   └── secrets.toml    # Secure credentials
 ├── tests/              # Test files
 │   ├── test_ui_components.py  # UI component tests
 │   ├── test_utils.py         # Utility function tests
@@ -52,15 +62,26 @@ Demo_app/
    cd Demo_app
    ```
 
-3. Create and activate a virtual environment (recommended):
+3. Create and activate a virtual environment:
    ```bash
    python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   source venv/bin/activate  # On Windows: .\venv\Scripts\activate
    ```
 
-4. Install the required dependencies:
+4. Install dependencies:
    ```bash
-   make setup
+   pip install -r requirements.txt
+   ```
+
+5. Configure Streamlit theme (optional):
+   Create or modify `.streamlit/config.toml`:
+   ```toml
+   [theme]
+   primaryColor = "#4B8BBE"
+   backgroundColor = "#F0F2F6"
+   secondaryBackgroundColor = "#FFFFFF"
+   textColor = "#31333F"
+   font = "sans serif"
    ```
 
 ## Development

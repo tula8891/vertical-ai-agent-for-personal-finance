@@ -444,17 +444,194 @@ def create_prompt(user_question):
     return prompt_context, results
 
 
+def landing_page():
+    """
+    Landing page of the Streamlit application that introduces the app and its features.
+    """
+    # Set up the page layout
+
+    # Custom CSS for styling (without hardcoding colors)
+    st.markdown(
+        """
+        <style>
+            /* Center align text and buttons */
+            .stButton>button {
+                width: 100%;
+                margin-top: 1rem;
+                font-weight: bold;
+                border-radius: 0.5rem;
+                padding: 0.5rem 1rem;
+            }
+            /* Hide Streamlit branding */
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+            header {visibility: hidden;}
+            /* Add spacing between sections */
+            .section {
+                margin-bottom: 2rem;
+            }
+            /* Custom font size for headers */
+            h1 {
+                font-size: 2.5rem;
+                text-align: center;
+            }
+            h2 {
+                font-size: 1.8rem;
+                margin-bottom: 1rem;
+            }
+            h3 {
+                font-size: 1.5rem;
+                margin-bottom: 0.5rem;
+            }
+            p {
+                font-size: 1.1rem;
+                line-height: 1.6;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # Navigation Bar
+    col1, col2, col3, col4, col5 = st.columns([4, 2, 2, 2, 2])
+    with col1:
+        st.markdown("### Econo Genie")
+    with col3:
+        if st.button("Home", key="nav_home_btn"):
+            st.session_state.page = "landing"
+            st.rerun()
+    with col4:
+        if st.button("Login", key="nav_login_btn"):
+            st.session_state.page = "login"
+            st.rerun()
+    with col5:
+        if st.button("Sign Up", key="nav_signup_btn"):
+            st.session_state.page = "signup"
+            st.rerun()
+
+    st.markdown("---")
+
+    # Welcome Section
+    st.markdown("# Welcome to Econo Genie")
+    st.markdown(
+        """
+        **The Only Finance AI Agent You'll Ever Need**
+
+        Econo Genie is your personal finance assistant designed to make managing your day-to-day finances simple, stress-free, and even fun.
+        """
+    )
+
+    st.markdown("---")
+
+    # Personalized Investment Recommendations Section
+    st.markdown("## Personalized Investment Recommendations")
+    st.markdown(
+        """
+        **Tailored advice based on your financial profile.**
+
+        We offer a wide range of investments, including stocks, bonds, mutual funds, and more.
+        """
+    )
+    if st.button("Start now", key="start_investment"):
+        st.session_state.page = "investment"
+        st.rerun()
+
+    st.markdown("---")
+
+    # Financial Literacy Section
+    st.markdown("## Financial Literacy")
+    st.markdown(
+        """
+        **Assessment, progress tracking, and suggestions on what to learn next.**
+
+        We offer a wide range of resources, including articles, videos, and quizzes.
+        """
+    )
+    if st.button("Explore now", key="explore_financial_literacy"):
+        st.session_state.page = "financial_literacy"
+        st.rerun()
+
+    st.markdown("---")
+
+    # AI Agents Section
+    st.markdown("## AI Agents [Work in Progress]")
+    st.markdown(
+        """
+        **The AI Financial Assistant is like having a smart, friendly money coach in your pocket.**
+
+        It's designed to make managing your day-to-day finances simple, stress-free, and even fun.
+        """
+    )
+    if st.button("Explore now", key="explore_ai_agents"):
+        st.session_state.page = "ai_agents"
+        st.rerun()
+
+    st.markdown("---")
+    """
+    Landing page of the Streamlit application that introduces the app and its features.
+    """
+    # Custom CSS for styling
+    st.markdown(
+        """
+        <style>
+            /* Center align text and buttons */
+            .stButton>button {
+                width: 100%;
+                margin-top: 1rem;
+                background-color: #4B8BBE;
+                color: white;
+                font-weight: bold;
+                border-radius: 0.5rem;
+                padding: 0.5rem 1rem;
+            }
+            .stButton>button:hover {
+                background-color: #306998;
+            }
+            /* Hide Streamlit branding */
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+            header {visibility: hidden;}
+            /* Add spacing between sections */
+            .section {
+                margin-bottom: 2rem;
+            }
+            /* Custom font size for headers */
+            h1 {
+                font-size: 2.5rem;
+                text-align: center;
+            }
+            h2 {
+                font-size: 1.8rem;
+                margin-bottom: 1rem;
+            }
+            h3 {
+                font-size: 1.5rem;
+                margin-bottom: 0.5rem;
+            }
+            p {
+                font-size: 1.1rem;
+                line-height: 1.6;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+# Main function to handle page flow
 def main():
     """
     Main function to handle the page flow of the Streamlit application.
 
     This function determines the current page in the session state and displays
-    the appropriate page (login, signup, or main page) based on the user's state.
+    the appropriate page (landing, login, signup, or main page) based on the user's state.
     """
     if "page" not in st.session_state:
-        st.session_state.page = "login"
+        st.session_state.page = "landing"
 
-    if st.session_state.page == "login":
+    if st.session_state.page == "landing":
+        landing_page()
+    elif st.session_state.page == "login":
         login_page(st)
     elif st.session_state.page == "signup":
         signup_page(st)

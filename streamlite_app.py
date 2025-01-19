@@ -497,31 +497,40 @@ def landing_page():
     with col1:
         st.markdown("### Econo Genie")
     with col3:
-        if st.button("Home", key="nav_home_btn"):
+        if st.button("Home", key="nav_home_btn", use_container_width=True):
             st.session_state.page = "landing"
             st.rerun()
     with col4:
-        if st.button("Login", key="nav_login_btn"):
+        if st.button("Login", key="nav_login_btn", use_container_width=True):
             st.session_state.page = "login"
             st.rerun()
     with col5:
-        if st.button("Sign Up", key="nav_signup_btn"):
+        if st.button("Sign Up", key="nav_signup_btn", use_container_width=True):
             st.session_state.page = "signup"
             st.rerun()
 
     st.markdown("---")
 
-    # Welcome Section
-    st.markdown("# Welcome to Econo Genie")
+    # Custom CSS for landing page buttons
     st.markdown(
         """
-        **The Only Finance AI Agent You'll Ever Need**
-
-        Econo Genie is your personal finance assistant designed to make managing your day-to-day finances simple, stress-free, and even fun.
-        """
+        <style>
+            .stButton>button {
+                font-size: 16px;
+                padding: 2px 10px;
+                border-radius: 4px;
+                height: 35px;
+                width: 100%;
+                margin: 0;
+            }
+            .button-col {
+                display: flex;
+                justify-content: center;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
     )
-
-    st.markdown("---")
 
     # Personalized Investment Recommendations Section
     st.markdown("## Personalized Investment Recommendations")
@@ -532,9 +541,11 @@ def landing_page():
         We offer a wide range of investments, including stocks, bonds, mutual funds, and more.
         """
     )
-    if st.button("Start now", key="start_investment"):
-        st.session_state.page = "signup"
-        st.rerun()
+    col1, col2, col3 = st.columns([12, 5, 4])
+    with col2:
+        if st.button("Start now", key="start_investment", use_container_width=True):
+            st.session_state.page = "signup"
+            st.rerun()
 
     st.markdown("---")
 
@@ -547,9 +558,13 @@ def landing_page():
         We offer a wide range of resources, including articles, videos, and quizzes.
         """
     )
-    if st.button("Explore now", key="explore_financial_literacy"):
-        st.session_state.page = "signup"
-        st.rerun()
+    col1, col2, col3 = st.columns([12, 5, 4])
+    with col2:
+        if st.button(
+            "Explore now", key="explore_financial_literacy", use_container_width=True
+        ):
+            st.session_state.page = "signup"
+            st.rerun()
 
     st.markdown("---")
 
@@ -562,9 +577,11 @@ def landing_page():
         It's designed to make managing your day-to-day finances simple, stress-free, and even fun.
         """
     )
-    if st.button("Explore now", key="explore_ai_agents"):
-        st.session_state.page = "signup"
-        st.rerun()
+    col1, col2, col3 = st.columns([12, 5, 4])
+    with col2:
+        if st.button("Explore now", key="explore_ai_agents", use_container_width=True):
+            st.session_state.page = "signup"
+            st.rerun()
 
     st.markdown("---")
     # Custom CSS for styling

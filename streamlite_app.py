@@ -533,7 +533,7 @@ def landing_page():
         """
     )
     if st.button("Start now", key="start_investment"):
-        st.session_state.page = "investment"
+        st.session_state.page = "signup"
         st.rerun()
 
     st.markdown("---")
@@ -548,7 +548,7 @@ def landing_page():
         """
     )
     if st.button("Explore now", key="explore_financial_literacy"):
-        st.session_state.page = "financial_literacy"
+        st.session_state.page = "signup"
         st.rerun()
 
     st.markdown("---")
@@ -563,13 +563,10 @@ def landing_page():
         """
     )
     if st.button("Explore now", key="explore_ai_agents"):
-        st.session_state.page = "ai_agents"
+        st.session_state.page = "signup"
         st.rerun()
 
     st.markdown("---")
-    """
-    Landing page of the Streamlit application that introduces the app and its features.
-    """
     # Custom CSS for styling
     st.markdown(
         """

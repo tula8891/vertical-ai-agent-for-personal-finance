@@ -20,9 +20,7 @@ mock_snowflake.cortex.Complete = mock_complete
 mock_snowflake.snowpark = MagicMock()
 mock_snowflake.snowpark.Session = mock_session
 mock_snowflake.snowpark.context = mock_context
-mock_snowflake.snowpark.context.get_active_session = MagicMock(
-    return_value=mock_session
-)
+mock_snowflake.snowpark.context.get_active_session = MagicMock(return_value=mock_session)
 
 # Apply the mocks
 import sys
@@ -188,9 +186,7 @@ class TestStreamliteApp(unittest.TestCase):
         self.assertEqual(results, mock_search_response.results)
 
         # Verify search was called correctly
-        mock_cortex_service.search.assert_called_once_with(
-            "test query", columns=["CHUNK"], limit=3
-        )
+        mock_cortex_service.search.assert_called_once_with("test query", columns=["CHUNK"], limit=3)
 
     def test_get_chat_history(self):
         """Test retrieving chat history"""
@@ -275,9 +271,7 @@ class TestStreamliteApp(unittest.TestCase):
 
         # Test without chat history
         context, results = create_prompt("test question")
-        mock_query_cortex.assert_called_with(
-            "test question", columns=["CHUNK"], filter={}
-        )
+        mock_query_cortex.assert_called_with("test question", columns=["CHUNK"], filter={})
         self.assertIsInstance(context, str)
         self.assertIn("test context", context)
         self.assertEqual(results, mock_results)
@@ -434,11 +428,7 @@ if __name__ == "__main__":
     total_tests = result.testsRun
     failures = len(result.failures)
     errors = len(result.errors)
-    success_rate = (
-        ((total_tests - failures - errors) / total_tests) * 100
-        if total_tests > 0
-        else 0
-    )
+    success_rate = ((total_tests - failures - errors) / total_tests) * 100 if total_tests > 0 else 0
 
     test_cases = []
     for test_case, error in result.failures + result.errors:
@@ -446,9 +436,7 @@ if __name__ == "__main__":
             {
                 "name": str(test_case),
                 "success": False,
-                "status": "Failed"
-                if test_case in [f[0] for f in result.failures]
-                else "Error",
+                "status": "Failed" if test_case in [f[0] for f in result.failures] else "Error",
                 "details": error,
                 "time": getattr(test_case, "elapsed_time", 0),
             }

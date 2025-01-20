@@ -13,6 +13,8 @@ repos:
     hooks:
     -   id: black                 # Essential for code formatting
         language_version: python3.9
+        args:
+        - --line-length=130
 
 -   repo: https://github.com/pycqa/flake8
     rev: 7.0.0

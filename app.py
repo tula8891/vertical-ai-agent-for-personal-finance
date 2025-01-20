@@ -467,7 +467,7 @@ def query_cortex_search_service(query, columns=[], filter={}):
       # Changed to include all columns
       context_documents = cortex_search_service.search(
           query,
-          columns=["chunk", "company_name"], # Include both chunk and company_name
+          columns=["chunk"], # Include both chunk and company_name
           limit=st.session_state.num_retrieved_chunks,
       )
 
@@ -578,8 +578,29 @@ def create_prompt(user_question):
 
     logging.info(f"Prompt context: {prompt_context}")
     logging.info(f"Results: {results}")
+    prompt = f"""
+        [INST]
 
-    return prompt_context, results
+        You are an expert educator with years of experience in teaching and providing constructive feedback. Below, I will provide a set of quiz questions along with the correct answers and a student's responses. Your task is to:
+        Evaluate the student's answers: Compare the student's responses to the correct answers and determine if they are correct, partially correct, or incorrect.
+        Provide detailed feedback: For each question, explain why the student's answer is correct or incorrect. If the answer is partially correct, highlight what was right and what was missing. If the answer is incorrect, provide a clear explanation of the correct concept.
+        Suggest further reading: For questions the student answered incorrectly or partially correctly, recommend specific topics, concepts, or resources (e.g., chapters, articles, videos) the student should review to improve their understanding.
+        Here is the quiz content, correct answers, and the student's responses
+
+        <chat_history>
+        {chat_history}
+        </chat_history>
+        <context>
+        {prompt_context}
+        </context>
+        <question>
+        {user_question}
+        </question>
+        [/INST]
+        Answer:
+        """
+
+    return prompt, results
 
 
 

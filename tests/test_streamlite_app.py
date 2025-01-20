@@ -66,22 +66,32 @@ class TestStreamliteApp(unittest.TestCase):
             {
                 "session": cls.session,
                 "messages": [],
+                "fin_lit_messages": [],
+                "investment_messages": [],
+                "ai_agent_messages": [],
                 "num_chat_messages": 2,
-                "num_chat_history_messages": 2,
-                "model_name": "test_model",
-                "selected_cortex_search_service": "test_service",
+                "model_name": "mistral-large2",
+                "selected_cortex_search_service": "EDU_SERVICE",
                 "use_chat_history": True,
+                "current_section": "financial_literacy",
                 "service_metadata": [
                     {
-                        "name": "test_service",
-                        "type": "search",
-                        "search_column": "chunk",
-                        "metadata": {"key": "value"},
-                    }
+                        "name": "EDU_SERVICE",
+                        "description": "Financial education and literacy content",
+                        "model": "mistral-large2",
+                        "search_column": "CHUNK",
+                    },
+                    {
+                        "name": "FIN_SERVICE",
+                        "description": "Investment recommendations and AI-powered analysis",
+                        "model": "mistral-large2",
+                        "search_column": "CHUNK",
+                    },
                 ],
-                "cortex_search_services": {"test_service": MagicMock()},
-                "clear_conversation": False,
-                "context_chunks": 5,
+                "cortex_search_services": {
+                    "EDU_SERVICE": MagicMock(),
+                    "FIN_SERVICE": MagicMock(),
+                },
                 "num_retrieved_chunks": 3,
                 "debug": False,
             }
@@ -95,22 +105,32 @@ class TestStreamliteApp(unittest.TestCase):
             {
                 "session": self.session,
                 "messages": [],
+                "fin_lit_messages": [],
+                "investment_messages": [],
+                "ai_agent_messages": [],
                 "num_chat_messages": 2,
-                "num_chat_history_messages": 2,
-                "model_name": "test_model",
-                "selected_cortex_search_service": "test_service",
+                "model_name": "mistral-large2",
+                "selected_cortex_search_service": "EDU_SERVICE",
                 "use_chat_history": True,
+                "current_section": "financial_literacy",
                 "service_metadata": [
                     {
-                        "name": "test_service",
-                        "type": "search",
-                        "search_column": "chunk",
-                        "metadata": {"key": "value"},
-                    }
+                        "name": "EDU_SERVICE",
+                        "description": "Financial education and literacy content",
+                        "model": "mistral-large2",
+                        "search_column": "CHUNK",
+                    },
+                    {
+                        "name": "FIN_SERVICE",
+                        "description": "Investment recommendations and AI-powered analysis",
+                        "model": "mistral-large2",
+                        "search_column": "CHUNK",
+                    },
                 ],
-                "cortex_search_services": {"test_service": MagicMock()},
-                "clear_conversation": False,
-                "context_chunks": 5,
+                "cortex_search_services": {
+                    "EDU_SERVICE": MagicMock(),
+                    "FIN_SERVICE": MagicMock(),
+                },
                 "num_retrieved_chunks": 3,
                 "debug": False,
             }
@@ -126,11 +146,17 @@ class TestStreamliteApp(unittest.TestCase):
         # Mock the service metadata
         mock_metadata = [
             {
-                "name": "test_service",
-                "type": "search",
-                "search_column": "chunk",
-                "metadata": {"key": "value"},
-            }
+                "name": "EDU_SERVICE",
+                "description": "Financial education and literacy content",
+                "model": "mistral-large2",
+                "search_column": "CHUNK",
+            },
+            {
+                "name": "FIN_SERVICE",
+                "description": "Investment recommendations and AI-powered analysis",
+                "model": "mistral-large2",
+                "search_column": "CHUNK",
+            },
         ]
         self.session.sql().collect.return_value = [{"metadata": mock_metadata}]
 
@@ -140,54 +166,75 @@ class TestStreamliteApp(unittest.TestCase):
 
     def test_query_cortex_search_service(self):
         """Test querying the cortex search service"""
-        # Mock session and query execution
-        mock_results = [{"chunk": "test chunk", "company_name": "test company"}]
+        # Mock search results
+        mock_results = [("test chunk",)]
+        mock_search_response = MagicMock()
+        mock_search_response.results = mock_results
 
-        # Mock the Root and cortex search service
-        mock_root = MagicMock()
+        # Set up mock cortex service
         mock_cortex_service = MagicMock()
-        mock_context_documents = MagicMock()
+        mock_cortex_service.search.return_value = mock_search_response
 
-        # Set up the mock chain
-        mock_root.databases.__getitem__().schemas.__getitem__().cortex_search_services.__getitem__.return_value = (
-            mock_cortex_service
+        # Update session state
+        st.session_state.cortex_search_services = {"EDU_SERVICE": mock_cortex_service}
+        st.session_state.selected_cortex_search_service = "EDU_SERVICE"
+        st.session_state.cortex_search_service = mock_cortex_service
+
+        # Test the function
+        context_str, results = query_cortex_search_service("test query")
+
+        # Verify results
+        self.assertIsInstance(context_str, str)
+        self.assertEqual(results, mock_search_response.results)
+
+        # Verify search was called correctly
+        mock_cortex_service.search.assert_called_once_with(
+            "test query", columns=["CHUNK"], limit=3
         )
-        mock_cortex_service.search.return_value = mock_context_documents
-        mock_context_documents.results = mock_results
-
-        # Mock session state
-        st.session_state.selected_cortex_search_service = "test_service"
-        st.session_state.num_retrieved_chunks = 1
-        st.session_state.service_metadata = [
-            {"name": "test_service", "search_column": "chunk"}
-        ]
-        st.session_state.debug = False
-
-        # Patch Root to return our mock
-        with patch("streamlite_app.Root", return_value=mock_root):
-            context_str, results = query_cortex_search_service("test query")
-            self.assertIsInstance(context_str, str)
-            self.assertEqual(results, mock_results)
-
-            # Verify the search was called with correct parameters
-            mock_cortex_service.search.assert_called_once_with(
-                "test query", columns=["chunk"], limit=1
-            )
 
     def test_get_chat_history(self):
         """Test retrieving chat history"""
-        # Initialize chat history with test messages
+        # Initialize feature-specific chat history
         test_messages = [
             {"role": "user", "content": "Hello"},
             {"role": "assistant", "content": "Hi"},
         ]
-        st.session_state.messages = test_messages  # Add all messages first
-        st.session_state.num_chat_history_messages = 1  # Only retrieve first message
+
+        # Test financial literacy section
+        st.session_state.current_section = "financial_literacy"
+        st.session_state.fin_lit_messages = test_messages.copy()
+        st.session_state.num_chat_messages = 2
 
         history = get_chat_history()
-        self.assertEqual(
-            history, test_messages[:1]
-        )  # Should only get the first message
+        self.assertEqual(history, test_messages)  # Should get all messages within limit
+
+        # Test with message limit
+        st.session_state.num_chat_messages = 1
+        history = get_chat_history()
+        self.assertEqual(history, [test_messages[-1]])  # Should get only last message
+
+        # Test investment section
+        st.session_state.current_section = "investment"
+        st.session_state.investment_messages = test_messages.copy()
+        st.session_state.num_chat_messages = 2
+        history = get_chat_history()
+        self.assertEqual(history, test_messages)
+
+        # Test ai_agents section
+        st.session_state.current_section = "ai_agents"
+        st.session_state.ai_agent_messages = test_messages.copy()
+        history = get_chat_history()
+        self.assertEqual(history, test_messages)
+
+        # Test empty history
+        st.session_state.ai_agent_messages = []
+        history = get_chat_history()
+        self.assertEqual(history, [])
+
+        # Test missing current_section
+        del st.session_state["current_section"]
+        history = get_chat_history()
+        self.assertEqual(history, [])
 
     def test_complete(self):
         """Test completion generation"""
@@ -195,7 +242,7 @@ class TestStreamliteApp(unittest.TestCase):
         mock_response = "Test completion"
         mock_complete.return_value = mock_response
 
-        response = complete("test_model", "test prompt")
+        response = complete("mistral-large2", "test prompt")
         self.assertEqual(response, mock_response)
 
     def test_make_chat_history_summary(self):
@@ -219,17 +266,17 @@ class TestStreamliteApp(unittest.TestCase):
         st.session_state.use_chat_history = False
         st.session_state.messages = []
         st.session_state.num_chat_messages = 3
-        st.session_state.selected_cortex_search_service = "test_service"
-        st.session_state.model_name = "test_model"
+        st.session_state.selected_cortex_search_service = "EDU_SERVICE"
+        st.session_state.model_name = "mistral-large2"
 
         # Mock query_cortex_search_service function
-        mock_results = [{"chunk": "test chunk", "company_name": "test company"}]
+        mock_results = [("test chunk",)]
         mock_query_cortex.return_value = ("test context", mock_results)
 
         # Test without chat history
         context, results = create_prompt("test question")
         mock_query_cortex.assert_called_with(
-            "test question", columns=["chunk", "company_name"], filter={}
+            "test question", columns=["CHUNK"], filter={}
         )
         self.assertIsInstance(context, str)
         self.assertIn("test context", context)
@@ -245,6 +292,82 @@ class TestStreamliteApp(unittest.TestCase):
         self.assertIsInstance(context, str)
         self.assertIn("test context", context)
         self.assertEqual(results, mock_results)
+
+    def test_init_messages(self):
+        """Test initialization of feature-specific message histories"""
+        # Clear session state
+        st.session_state.clear()
+
+        # Initialize messages
+        init_messages()
+
+        # Check all message lists are initialized
+        self.assertIn("messages", st.session_state)
+        self.assertIn("fin_lit_messages", st.session_state)
+        self.assertIn("investment_messages", st.session_state)
+        self.assertIn("ai_agent_messages", st.session_state)
+
+        # Verify they are empty lists
+        self.assertEqual(st.session_state.messages, [])
+        self.assertEqual(st.session_state.fin_lit_messages, [])
+        self.assertEqual(st.session_state.investment_messages, [])
+        self.assertEqual(st.session_state.ai_agent_messages, [])
+
+    def test_init_config_options(self):
+        """Test configuration options initialization"""
+        # Clear session state
+        st.session_state.clear()
+        st.session_state.current_section = "financial_literacy"
+
+        # Initialize config
+        init_config_options()
+
+        # Check service selection based on section
+        self.assertEqual(st.session_state.selected_cortex_search_service, "EDU_SERVICE")
+        self.assertEqual(st.session_state.model_name, "mistral-large2")
+
+        # Check default options
+        self.assertTrue(st.session_state.use_chat_history)
+        self.assertEqual(st.session_state.num_retrieved_chunks, 5)
+        self.assertEqual(st.session_state.num_chat_messages, 5)
+
+        # Test investment section
+        st.session_state.current_section = "investment"
+        init_config_options()
+        self.assertEqual(st.session_state.selected_cortex_search_service, "FIN_SERVICE")
+
+    def test_create_prompt_with_feature_specific_base_prompts(self):
+        """Test prompt creation with feature-specific base prompts"""
+        # Set up session state
+        st.session_state.current_section = "financial_literacy"
+        st.session_state.use_chat_history = True
+        st.session_state.fin_lit_messages = [
+            {"role": "user", "content": "What is compound interest?"},
+            {"role": "assistant", "content": "Compound interest is..."},
+        ]
+
+        # Mock query_cortex_search_service
+        mock_results = [("test chunk",)]
+        with patch(
+            "streamlite_app.query_cortex_search_service",
+            return_value=("test context", mock_results),
+        ):
+            prompt, results = create_prompt("How does it work?")
+
+            # Verify prompt structure
+            self.assertIn("financial education expert", prompt)
+            self.assertIn("test context", prompt)
+            self.assertIn("How does it work?", prompt)
+
+            # Test investment section prompt
+            st.session_state.current_section = "investment"
+            prompt, _ = create_prompt("What stocks should I buy?")
+            self.assertIn("investment advisor", prompt)
+
+            # Test AI agents section prompt
+            st.session_state.current_section = "ai_agents"
+            prompt, _ = create_prompt("Analyze market trends")
+            self.assertIn("AI-powered financial analysis agent", prompt)
 
 
 if __name__ == "__main__":

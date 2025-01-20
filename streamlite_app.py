@@ -14,13 +14,11 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
+# Define the model to use
+MODEL_NAME = "mistral-large2"
 
-# List of available models
-MODELS = [
-    "mistral-large2",
-    "llama3.1-70b",
-    "llama3.1-8b",
-]
+# Define chat icons/avatars
+icons = {"user": "👤", "assistant": "🤖", "system": "ℹ️"}
 
 # Configure Streamlit page settings
 st.set_page_config(
@@ -88,9 +86,7 @@ def initialize_session():
 # Main page function
 def main_page():
     """
-    Main page of the Streamlit application that displays the chat interface,
-    manages user login/logout, and handles chat interactions with the Snowflake Cortex.
-    It also initializes session state variables and displays chat messages from history.
+    Main page of the Streamlit application.
     """
     logging.info("Displaying main page.")
 
@@ -272,7 +268,10 @@ def main_page():
     if "current_section" not in st.session_state:
         st.session_state.current_section = "financial_literacy"
 
-    # Main content area
+    # Initialize chat histories if not exists
+    init_messages()
+
+    # Main content area with separate chat interfaces
     if st.session_state.current_section == "financial_literacy":
         st.header("📚 Financial Literacy")
         st.markdown(
@@ -284,6 +283,8 @@ def main_page():
         - Access educational resources
         """
         )
+        # Financial Literacy Chat Interface
+        display_chat_interface("fin_lit", "Ask about financial concepts...")
 
     elif st.session_state.current_section == "investment":
         st.header("💰 Personalized Investment Recommendations")
@@ -296,6 +297,8 @@ def main_page():
         - Market insights
         """
         )
+        # Investment Chat Interface
+        display_chat_interface("investment", "Ask about investment strategies...")
 
     elif st.session_state.current_section == "ai_agents":
         st.header("🤖 AI Agents [Beta]")
@@ -308,7 +311,11 @@ def main_page():
         - Real-time assistance
         """
         )
-    logging.info(f"Current section displayed: {st.session_state.current_section}")
+        st.warning(
+            "This is a beta feature. Recommendations should be verified with a financial advisor."
+        )
+        # AI Agents Chat Interface
+        display_chat_interface("ai_agent", "Ask for AI-powered analysis...")
 
     # Display a welcome message
     st.write("Welcome to the main page!")
@@ -327,65 +334,195 @@ def main_page():
             with st.chat_message(message["role"], avatar=icons[message["role"]]):
                 st.markdown(message["content"])
 
-    # Check if the chat is disabled
-    disable_chat = (
-        "service_metadata" not in st.session_state
-        or len(st.session_state.service_metadata) == 0
-    )
-    if question := st.chat_input("Ask a question...", disabled=disable_chat):
-        logging.info(f"User input received: {question}")
-        # Add user message to chat history
-        st.session_state.messages.append({"role": "user", "content": question})
-        # Display user message in chat message container
+
+def display_chat_interface(feature_key, placeholder_text):
+    """
+    Display a chat interface for a specific feature.
+    """
+    # Get feature-specific messages
+    if feature_key == "fin_lit":
+        messages = st.session_state.fin_lit_messages
+    elif feature_key == "investment":
+        messages = st.session_state.investment_messages
+    else:  # ai_agent
+        messages = st.session_state.ai_agent_messages
+
+    # Display chat messages
+    for message in messages:
+        with st.chat_message(message["role"], avatar=icons[message["role"]]):
+            st.markdown(message["content"])
+
+    # Chat input
+    if question := st.chat_input(placeholder_text):
+        # Display user message
         with st.chat_message("user", avatar=icons["user"]):
             st.markdown(question.replace("$", "\$"))
 
-        # Display assistant response in chat message container
+        # Add to feature-specific history
+        if feature_key == "fin_lit":
+            st.session_state.fin_lit_messages.append(
+                {"role": "user", "content": question}
+            )
+        elif feature_key == "investment":
+            st.session_state.investment_messages.append(
+                {"role": "user", "content": question}
+            )
+        else:  # ai_agent
+            st.session_state.ai_agent_messages.append(
+                {"role": "user", "content": question}
+            )
+
+        # Generate response
         with st.chat_message("assistant", avatar=icons["assistant"]):
             message_placeholder = st.empty()
-            question = question.replace("'", "")
             try:
                 prompt, results = create_prompt(question)
                 with st.spinner("Thinking..."):
                     generated_response = complete(
-                        st.session_state.model_name,
+                        MODEL_NAME,
                         prompt,
                         session=st.session_state.session,
                     )
-                    # build references table for citation
-                    markdown_table = (
-                        "###### References \n\n| PDF Title | URL |\n|-------|-----|\n"
-                    )
-                    for ref in results:
-                        markdown_table += f"| {ref['chunk']} | {ref.get('company_name', 'N/A')} |\n"  # added the company name
-                    message_placeholder.markdown(
-                        generated_response + "\n\n" + markdown_table
-                    )
-                logging.info(f"Assistant generated response: {generated_response}")
+
+                    # Add citations if available
+                    if results:
+                        markdown_table = (
+                            "###### References \n\n| Content |\n|--------|\n"
+                        )
+                        for result in results:
+                            if isinstance(result, dict) and "CHUNK" in result:
+                                chunk = result["CHUNK"]
+                            elif isinstance(result, (list, tuple)) and len(result) > 0:
+                                chunk = str(result[0])
+                            else:
+                                continue
+                            markdown_table += f"| {chunk} |\n"
+                        generated_response += "\n\n" + markdown_table
+
+                    message_placeholder.markdown(generated_response)
+
+                    # Add to feature-specific history
+                    if feature_key == "fin_lit":
+                        st.session_state.fin_lit_messages.append(
+                            {"role": "assistant", "content": generated_response}
+                        )
+                    elif feature_key == "investment":
+                        st.session_state.investment_messages.append(
+                            {"role": "assistant", "content": generated_response}
+                        )
+                    else:  # ai_agent
+                        st.session_state.ai_agent_messages.append(
+                            {"role": "assistant", "content": generated_response}
+                        )
+
             except Exception as e:
+                error_msg = "An error occurred while processing your request."
+                message_placeholder.markdown(error_msg)
                 logging.error(f"Error during chat completion: {e}")
-                message_placeholder.markdown(
-                    "An error occurred while processing your request."
-                )
-                generated_response = "An error occurred."
-
-        st.session_state.messages.append(
-            {"role": "assistant", "content": generated_response}
-        )
 
 
-# Your original helper functions
 def init_messages():
     """
     Initialize the chat messages in the session state.
     """
-    logging.info("Initializing chat messages.")
-    if (
-        st.session_state.get("clear_conversation", False)
-        or "messages" not in st.session_state
-    ):
+    if "messages" not in st.session_state:
         st.session_state.messages = []
-        logging.info("Chat messages initialized or cleared.")
+
+    # Initialize feature-specific message histories
+    if "fin_lit_messages" not in st.session_state:
+        st.session_state.fin_lit_messages = []
+    if "investment_messages" not in st.session_state:
+        st.session_state.investment_messages = []
+    if "ai_agent_messages" not in st.session_state:
+        st.session_state.ai_agent_messages = []
+
+
+def get_chat_history():
+    """
+    Retrieve the chat history from the session state based on current section.
+    """
+    if "current_section" not in st.session_state:
+        return []
+
+    section = st.session_state.current_section
+    if section == "financial_literacy":
+        messages = st.session_state.fin_lit_messages
+    elif section == "investment":
+        messages = st.session_state.investment_messages
+    else:  # ai_agents
+        messages = st.session_state.ai_agent_messages
+
+    num_messages = st.session_state.num_chat_messages
+    return messages[-num_messages:] if messages else []
+
+
+def create_prompt(user_question):
+    """
+    Create a prompt for the chatbot based on the user's question and chat history.
+    """
+    logging.info(f"Creating prompt with user question: {user_question}")
+
+    # Get section-specific chat history
+    chat_history = get_chat_history()
+    section = st.session_state.current_section
+
+    # Define base prompts for each section
+    base_prompts = {
+        "financial_literacy": """You are a financial education expert. Focus on:
+            1. Clear explanations of financial concepts
+            2. Building financial literacy
+            3. Educational examples
+            4. Beginner-friendly language
+            5. Explaining technical terms when used""",
+        "investment": """You are a personalized investment advisor. Focus on:
+            1. Risk-appropriate recommendations
+            2. Portfolio diversification
+            3. Market analysis
+            4. Investment strategies
+            5. Clear risk disclosures""",
+        "ai_agents": """You are an AI-powered financial analysis agent using Mistral. Focus on:
+            1. Advanced market insights
+            2. Data-driven analysis
+            3. Trend predictions
+            4. Risk assessment
+            5. Complex financial modeling
+            Note: Always remind users this is a beta feature requiring verification.""",
+    }
+
+    # Get the appropriate base prompt
+    base_prompt = base_prompts.get(section, base_prompts["financial_literacy"])
+
+    if st.session_state.use_chat_history and chat_history:
+        # Create context-aware prompt
+        question_summary = make_chat_history_summary(chat_history, user_question)
+        prompt_context, results = query_cortex_search_service(
+            question_summary, columns=["CHUNK"], filter={}
+        )
+    else:
+        # Create standalone prompt
+        prompt_context, results = query_cortex_search_service(
+            user_question, columns=["CHUNK"], filter={}
+        )
+
+    # Combine into final prompt
+    final_prompt = f"""[INST]
+    {base_prompt}
+
+    <chat_history>
+    {chat_history if chat_history else "No previous context"}
+    </chat_history>
+
+    <context>
+    {prompt_context}
+    </context>
+
+    <question>
+    {user_question}
+    </question>
+    [/INST]
+    """
+
+    return final_prompt, results
 
 
 def init_service_metadata():
@@ -394,27 +531,37 @@ def init_service_metadata():
     """
     logging.info("Initializing service metadata.")
     if "service_metadata" not in st.session_state:
-        try:
-            session = st.session_state.session
-            services = session.sql("SHOW CORTEX SEARCH SERVICES;").collect()
-            service_metadata = []
-            if services:
-                for s in services:
-                    svc_name = s["name"]
-                    svc_search_col = session.sql(
-                        f"DESC CORTEX SEARCH SERVICE {svc_name};"
-                    ).collect()[0]["search_column"]
-                    service_metadata.append(
-                        {"name": svc_name, "search_column": svc_search_col}
-                    )
-            st.session_state.service_metadata = service_metadata
-            logging.info(
-                f"Service metadata initialized: {st.session_state.service_metadata}"
-            )
-        except Exception as e:
-            logging.error(f"Error fetching service metadata: {e}")
-            st.error("An error occurred while fetching service metadata. Check logs.")
-            st.session_state.service_metadata = []
+        st.session_state.service_metadata = []
+
+        # Define EDU_SERVICE metadata
+        edu_service = {
+            "name": "EDU_SERVICE",
+            "description": "Financial education and literacy content",
+            "model": "mistral-large2",
+            "search_column": "CHUNK",
+        }
+
+        # Define FIN_SERVICE metadata
+        fin_service = {
+            "name": "FIN_SERVICE",
+            "description": "Investment recommendations and AI-powered analysis",
+            "model": "mistral-large2",
+            "search_column": "CHUNK",
+        }
+
+        st.session_state.service_metadata = [edu_service, fin_service]
+        logging.info(
+            f"Service metadata initialized: {st.session_state.service_metadata}"
+        )
+
+        # Set default service based on current section
+        if "current_section" in st.session_state:
+            if st.session_state.current_section == "financial_literacy":
+                st.session_state.selected_cortex_search_service = "EDU_SERVICE"
+            else:  # investment or ai_agents
+                st.session_state.selected_cortex_search_service = "FIN_SERVICE"
+        else:
+            st.session_state.selected_cortex_search_service = "EDU_SERVICE"
     else:
         logging.info("Service metadata already present in session state.")
 
@@ -425,91 +572,79 @@ def init_config_options():
     """
     logging.info("Initializing config options.")
 
-    # Set the model name based on current section
+    # Set the model name and service based on current section
     if "current_section" in st.session_state:
         if st.session_state.current_section == "financial_literacy":
-            st.session_state.model_name = "mistral-large2"
             st.session_state.selected_cortex_search_service = "EDU_SERVICE"
         else:  # investment or ai_agents
-            st.session_state.model_name = "mistral-large2"
             st.session_state.selected_cortex_search_service = "FIN_SERVICE"
     else:
-        st.session_state.model_name = "mistral-large2"
         st.session_state.selected_cortex_search_service = "EDU_SERVICE"
+
+    # Always use mistral-large2 model
+    st.session_state.model_name = MODEL_NAME
 
     # Initialize other config options if not already set
     if "use_chat_history" not in st.session_state:
         st.session_state.use_chat_history = True
     if "num_retrieved_chunks" not in st.session_state:
         st.session_state.num_retrieved_chunks = 5
+    if "num_chat_messages" not in st.session_state:
+        st.session_state.num_chat_messages = 5
+
+    logging.info("Config options initialized successfully.")
 
 
 def query_cortex_search_service(query, columns=[], filter={}):
     """
-    Perform a search query on the selected Cortex search service, including 'company_name' and 'chunk'.
+    Perform a search query on the selected Cortex search service.
     """
     logging.info(
         f"Querying cortex search service with query: {query}, columns: {columns}, filter: {filter}"
     )
-    session = st.session_state.session
-    if not session:
-        return "", []
-    db, schema = session.get_current_database(), session.get_current_schema()
-
-    root = Root(session)
-
     try:
-        cortex_search_service = (
-            root.databases[db]
-            .schemas[schema]
-            .cortex_search_services[st.session_state.selected_cortex_search_service]
-        )
+        if not hasattr(st.session_state, "cortex_search_service"):
+            logging.error("Cortex search service not initialized")
+            return "", []
+
+        cortex_search_service = st.session_state.cortex_search_services[
+            st.session_state.selected_cortex_search_service
+        ]
         logging.info(f"Selected cortex search service: {cortex_search_service}")
-        # Changed to include all columns
-        context_documents = cortex_search_service.search(
+
+        # Query the search service
+        search_response = cortex_search_service.search(
             query,
-            columns=["chunk"],  # Include both chunk and company_name
+            columns=["CHUNK"],
             limit=st.session_state.num_retrieved_chunks,
         )
 
-        results = context_documents.results
+        if not search_response or not hasattr(search_response, "results"):
+            logging.warning("No search results found")
+            return "", []
 
-        context_str = ""
-        for i, r in enumerate(results):
-            context_str += (
-                f"Context document {i + 1}: {r['chunk']} (Company: {r.get('company_name', 'N/A')}) \n"
-                + "\n"
-            )
+        # Extract chunks from results
+        results = search_response.results
+        chunks = []
+        for result in results:
+            if isinstance(result, dict) and "CHUNK" in result:
+                chunks.append(result["CHUNK"])
+            elif isinstance(result, (list, tuple)) and len(result) > 0:
+                # If result is a sequence, take the first element as CHUNK
+                chunks.append(str(result[0]))
+            else:
+                logging.warning(f"Unexpected result format: {type(result)}")
+                continue
 
-        if st.session_state.debug:
-            st.sidebar.text_area("Context documents", context_str, height=500)
-        logging.info(
-            f"Cortex search service query successful, found {len(results)} documents"
-        )
+        # Create context string
+        context = "\n".join(chunks) if chunks else ""
 
-        return context_str, results
+        logging.info(f"Found {len(chunks)} context documents")
+        return context, results
+
     except Exception as e:
         logging.error(f"Error querying cortex search service: {e}")
-        st.error("An error occured while fetching the data, please check logs")
         return "", []
-
-
-def get_chat_history():
-    """
-    Retrieve the chat history from the session state.
-    """
-    logging.info("Retrieving chat history.")
-    if "messages" not in st.session_state:
-        logging.warning("No chat messages found in session state")
-        return []
-    start_index = max(
-        0, len(st.session_state.messages) - st.session_state.num_chat_messages
-    )
-    history = st.session_state.messages[
-        start_index : len(st.session_state.messages) - 1
-    ]
-    logging.info(f"Retrieved {len(history)} chat messages.")
-    return history
 
 
 def complete(model, prompt, session=None):
@@ -550,72 +685,6 @@ def make_chat_history_summary(chat_history, question):
     return complete(
         st.session_state.model_name, prompt, session=st.session_state.session
     )
-
-
-def create_prompt(user_question):
-    """
-    Create a prompt for the chatbot based on the user's question and chat history.
-    """
-    logging.info(f"Creating prompt with user question: {user_question}")
-    if st.session_state.use_chat_history:
-        logging.info("Using chat history.")
-        chat_history = get_chat_history()
-        if chat_history:
-            question_summary = make_chat_history_summary(chat_history, user_question)
-            logging.info(
-                f"Summary of the question: {question_summary}"
-            )  # Add log for summary
-            prompt_context, results = query_cortex_search_service(
-                question_summary,
-                columns=["chunk", "company_name"],  # ADD COMPANY NAME
-                filter={},
-            )
-            logging.info("Chat history used and query processed.")
-        else:
-            prompt_context, results = query_cortex_search_service(
-                user_question,
-                columns=["chunk", "company_name"],  # ADD COMPANY NAME
-                filter={},
-            )
-            logging.info(
-                "No chat history found, using the current user question for query"
-            )
-            chat_history = ""
-    else:
-        logging.info("Not using chat history.")
-        prompt_context, results = query_cortex_search_service(
-            user_question,
-            columns=["chunk", "company_name"],  # ADD COMPANY NAME
-            filter={},
-        )
-        chat_history = ""
-        logging.info("Query processed without chat history.")
-
-    logging.info(f"Prompt context: {prompt_context}")
-    logging.info(f"Results: {results}")
-    prompt = f"""
-        [INST]
-
-        You are an expert educator with years of experience in teaching and providing constructive feedback. Below, I will provide a set of quiz questions along with the correct answers and a student's responses. Your task is to:
-        Evaluate the student's answers: Compare the student's responses to the correct answers and determine if they are correct, partially correct, or incorrect.
-        Provide detailed feedback: For each question, explain why the student's answer is correct or incorrect. If the answer is partially correct, highlight what was right and what was missing. If the answer is incorrect, provide a clear explanation of the correct concept.
-        Suggest further reading: For questions the student answered incorrectly or partially correctly, recommend specific topics, concepts, or resources (e.g., chapters, articles, videos) the student should review to improve their understanding.
-        Here is the quiz content, correct answers, and the student's responses
-
-        <chat_history>
-        {chat_history}
-        </chat_history>
-        <context>
-        {prompt_context}
-        </context>
-        <question>
-        {user_question}
-        </question>
-        [/INST]
-        Answer:
-        """
-
-    return prompt, results
 
 
 def landing_page():

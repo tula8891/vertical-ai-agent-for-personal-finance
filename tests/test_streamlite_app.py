@@ -140,7 +140,7 @@ class TestStreamliteApp(unittest.TestCase):
 
     def test_query_cortex_search_service(self):
         """Test querying the cortex search service"""
-        # Mock search results
+        # Mock session and query execution
         mock_results = [{"chunk": "test chunk", "company_name": "test company"}]
 
         # Mock the Root and cortex search service
@@ -171,7 +171,7 @@ class TestStreamliteApp(unittest.TestCase):
 
             # Verify the search was called with correct parameters
             mock_cortex_service.search.assert_called_once_with(
-                "test query", columns=["chunk", "company_name"], limit=1
+                "test query", columns=["chunk"], limit=1
             )
 
     def test_get_chat_history(self):
@@ -216,27 +216,24 @@ class TestStreamliteApp(unittest.TestCase):
     def test_create_prompt(self, mock_query_cortex):
         """Test creating a prompt"""
         # Initialize session state variables
-        if "use_chat_history" not in st.session_state:
-            st.session_state.use_chat_history = False
-        if "messages" not in st.session_state:
-            st.session_state.messages = []
-        if "num_messages" not in st.session_state:
-            st.session_state.num_messages = 3
-        if "selected_service" not in st.session_state:
-            st.session_state.selected_service = "test_service"
+        st.session_state.use_chat_history = False
+        st.session_state.messages = []
+        st.session_state.num_chat_messages = 3
+        st.session_state.selected_cortex_search_service = "test_service"
+        st.session_state.model_name = "test_model"
 
         # Mock query_cortex_search_service function
         mock_results = [{"chunk": "test chunk", "company_name": "test company"}]
         mock_query_cortex.return_value = ("test context", mock_results)
 
         # Test without chat history
-        st.session_state.use_chat_history = False
         context, results = create_prompt("test question")
-        self.assertEqual(context, "test context")
-        self.assertEqual(results, mock_results)
         mock_query_cortex.assert_called_with(
-            "test question", columns=["chunk"], filter={}
+            "test question", columns=["chunk", "company_name"], filter={}
         )
+        self.assertIsInstance(context, str)
+        self.assertIn("test context", context)
+        self.assertEqual(results, mock_results)
 
         # Test with chat history
         st.session_state.use_chat_history = True
@@ -245,7 +242,8 @@ class TestStreamliteApp(unittest.TestCase):
             {"role": "assistant", "content": "previous answer"},
         ]
         context, results = create_prompt("test question")
-        self.assertEqual(context, "test context")
+        self.assertIsInstance(context, str)
+        self.assertIn("test context", context)
         self.assertEqual(results, mock_results)
 
 

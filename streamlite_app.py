@@ -9,9 +9,10 @@ from snowflake.snowpark import Session
 from util.login_page import login_page
 from util.signup_page import signup_page
 
-
 # Configure logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 
 # List of available models
@@ -59,7 +60,9 @@ def initialize_session():
     """
     logging.info("Initializing Snowflake session.")
     if "session" not in st.session_state:
-        logging.info("Snowflake session not found in session state, creating a new one.")
+        logging.info(
+            "Snowflake session not found in session state, creating a new one."
+        )
         connection_params = {
             "account": st.secrets["myconnection"]["account"],
             "user": st.secrets["myconnection"]["user"],
@@ -69,7 +72,9 @@ def initialize_session():
             "schema": st.secrets["myconnection"]["schema"],
         }
         try:
-            st.session_state.session = Session.builder.configs(connection_params).create()
+            st.session_state.session = Session.builder.configs(
+                connection_params
+            ).create()
             logging.info("Snowflake session created successfully.")
         except Exception as e:
             logging.error(f"Error creating Snowflake session: {e}")
@@ -130,7 +135,9 @@ def main_page():
         st.caption("Personal Finance BRO")
     with nav_col3:
         if st.button("🚪 Logout", type="secondary", use_container_width=True):
-            logging.info("Logout button clicked. Clearing session state and redirecting to login page.")
+            logging.info(
+                "Logout button clicked. Clearing session state and redirecting to login page."
+            )
             st.session_state.clear()
             st.session_state.page = "login"
             st.rerun()
@@ -205,8 +212,9 @@ def main_page():
             st.session_state.financial_goals = goals
         if "investment_horizon" not in st.session_state:
             st.session_state.investment_horizon = horizon
-        logging.info(f"User profile - Risk: {risk_profile}, Goals: {goals}, Horizon: {horizon}")
-
+        logging.info(
+            f"User profile - Risk: {risk_profile}, Goals: {goals}, Horizon: {horizon}"
+        )
 
     st.markdown("---")
 
@@ -253,11 +261,12 @@ def main_page():
             unsafe_allow_html=True,
         )
         if st.button("🚪 Logout", key="sidebar_logout"):
-            logging.info("Sidebar logout button clicked, logging out user and navigating to landing page")
+            logging.info(
+                "Sidebar logout button clicked, logging out user and navigating to landing page"
+            )
             st.session_state.clear()
             st.session_state.page = "landing"
             st.rerun()
-
 
     # Initialize session state for current section if not exists
     if "current_section" not in st.session_state:
@@ -301,7 +310,6 @@ def main_page():
         )
     logging.info(f"Current section displayed: {st.session_state.current_section}")
 
-
     # Display a welcome message
     st.write("Welcome to the main page!")
 
@@ -318,7 +326,6 @@ def main_page():
         for message in st.session_state.messages:
             with st.chat_message(message["role"], avatar=icons[message["role"]]):
                 st.markdown(message["content"])
-
 
     # Check if the chat is disabled
     disable_chat = (
@@ -340,20 +347,26 @@ def main_page():
             try:
                 prompt, results = create_prompt(question)
                 with st.spinner("Thinking..."):
-                    generated_response = complete(st.session_state.model_name, prompt, session = st.session_state.session)
+                    generated_response = complete(
+                        st.session_state.model_name,
+                        prompt,
+                        session=st.session_state.session,
+                    )
                     # build references table for citation
                     markdown_table = (
                         "###### References \n\n| PDF Title | URL |\n|-------|-----|\n"
                     )
                     for ref in results:
-                        markdown_table += f"| {ref['chunk']} | {ref.get('company_name', 'N/A')} |\n" # added the company name
+                        markdown_table += f"| {ref['chunk']} | {ref.get('company_name', 'N/A')} |\n"  # added the company name
                     message_placeholder.markdown(
                         generated_response + "\n\n" + markdown_table
                     )
                 logging.info(f"Assistant generated response: {generated_response}")
             except Exception as e:
                 logging.error(f"Error during chat completion: {e}")
-                message_placeholder.markdown("An error occurred while processing your request.")
+                message_placeholder.markdown(
+                    "An error occurred while processing your request."
+                )
                 generated_response = "An error occurred."
 
         st.session_state.messages.append(
@@ -367,7 +380,10 @@ def init_messages():
     Initialize the chat messages in the session state.
     """
     logging.info("Initializing chat messages.")
-    if st.session_state.get('clear_conversation', False) or "messages" not in st.session_state:
+    if (
+        st.session_state.get("clear_conversation", False)
+        or "messages" not in st.session_state
+    ):
         st.session_state.messages = []
         logging.info("Chat messages initialized or cleared.")
 
@@ -392,7 +408,9 @@ def init_service_metadata():
                         {"name": svc_name, "search_column": svc_search_col}
                     )
             st.session_state.service_metadata = service_metadata
-            logging.info(f"Service metadata initialized: {st.session_state.service_metadata}")
+            logging.info(
+                f"Service metadata initialized: {st.session_state.service_metadata}"
+            )
         except Exception as e:
             logging.error(f"Error fetching service metadata: {e}")
             st.error("An error occurred while fetching service metadata. Check logs.")
@@ -401,26 +419,25 @@ def init_service_metadata():
         logging.info("Service metadata already present in session state.")
 
 
-
 def init_config_options():
     """
     Initialize the configuration options for the Streamlit application.
     """
     logging.info("Initializing config options.")
     if "service_metadata" in st.session_state and st.session_state.service_metadata:
-      st.sidebar.selectbox(
-          "Select cortex search service:",
-          [s["name"] for s in st.session_state.service_metadata],
-          key="selected_cortex_search_service",
-      )
+        st.sidebar.selectbox(
+            "Select cortex search service:",
+            [s["name"] for s in st.session_state.service_metadata],
+            key="selected_cortex_search_service",
+        )
     else:
-      st.sidebar.selectbox(
-          "Select cortex search service:",
-          [],
-          key="selected_cortex_search_service",
-          disabled=True,
-          help="No Search Service available, check logs"
-      )
+        st.sidebar.selectbox(
+            "Select cortex search service:",
+            [],
+            key="selected_cortex_search_service",
+            disabled=True,
+            help="No Search Service available, check logs",
+        )
 
     st.sidebar.button("Clear conversation", key="clear_conversation")
     st.sidebar.toggle("Debug", key="debug", value=False)
@@ -450,43 +467,51 @@ def query_cortex_search_service(query, columns=[], filter={}):
     """
     Perform a search query on the selected Cortex search service, including 'company_name' and 'chunk'.
     """
-    logging.info(f"Querying cortex search service with query: {query}, columns: {columns}, filter: {filter}")
+    logging.info(
+        f"Querying cortex search service with query: {query}, columns: {columns}, filter: {filter}"
+    )
     session = st.session_state.session
     if not session:
-      return "", []
+        return "", []
     db, schema = session.get_current_database(), session.get_current_schema()
 
     root = Root(session)
 
     try:
-      cortex_search_service = (
-          root.databases[db]
-          .schemas[schema]
-          .cortex_search_services[st.session_state.selected_cortex_search_service]
-      )
-      logging.info(f"Selected cortex search service: {cortex_search_service}")
-      # Changed to include all columns
-      context_documents = cortex_search_service.search(
-          query,
-          columns=["chunk"], # Include both chunk and company_name
-          limit=st.session_state.num_retrieved_chunks,
-      )
+        cortex_search_service = (
+            root.databases[db]
+            .schemas[schema]
+            .cortex_search_services[st.session_state.selected_cortex_search_service]
+        )
+        logging.info(f"Selected cortex search service: {cortex_search_service}")
+        # Changed to include all columns
+        context_documents = cortex_search_service.search(
+            query,
+            columns=["chunk"],  # Include both chunk and company_name
+            limit=st.session_state.num_retrieved_chunks,
+        )
 
-      results = context_documents.results
+        results = context_documents.results
 
-      context_str = ""
-      for i, r in enumerate(results):
-          context_str += f"Context document {i + 1}: {r['chunk']} (Company: {r.get('company_name', 'N/A')}) \n" + "\n"
+        context_str = ""
+        for i, r in enumerate(results):
+            context_str += (
+                f"Context document {i + 1}: {r['chunk']} (Company: {r.get('company_name', 'N/A')}) \n"
+                + "\n"
+            )
 
-      if st.session_state.debug:
-          st.sidebar.text_area("Context documents", context_str, height=500)
-      logging.info(f"Cortex search service query successful, found {len(results)} documents")
+        if st.session_state.debug:
+            st.sidebar.text_area("Context documents", context_str, height=500)
+        logging.info(
+            f"Cortex search service query successful, found {len(results)} documents"
+        )
 
-      return context_str, results
+        return context_str, results
     except Exception as e:
         logging.error(f"Error querying cortex search service: {e}")
-        st.error(f"An error occured while fetching the data, please check logs")
+        st.error("An error occured while fetching the data, please check logs")
         return "", []
+
 
 def get_chat_history():
     """
@@ -494,12 +519,14 @@ def get_chat_history():
     """
     logging.info("Retrieving chat history.")
     if "messages" not in st.session_state:
-      logging.warning("No chat messages found in session state")
-      return []
+        logging.warning("No chat messages found in session state")
+        return []
     start_index = max(
         0, len(st.session_state.messages) - st.session_state.num_chat_messages
     )
-    history = st.session_state.messages[start_index : len(st.session_state.messages) - 1]
+    history = st.session_state.messages[
+        start_index : len(st.session_state.messages) - 1
+    ]
     logging.info(f"Retrieved {len(history)} chat messages.")
     return history
 
@@ -510,7 +537,7 @@ def complete(model, prompt, session=None):
     """
     logging.info(f"Generating completion with model: {model}, prompt: {prompt}")
     try:
-        response = Complete(model, prompt, session = session).replace("$", "\$")
+        response = Complete(model, prompt, session=session).replace("$", "\$")
         logging.info("Completion generated successfully.")
         return response
     except Exception as e:
@@ -539,7 +566,9 @@ def make_chat_history_summary(chat_history, question):
         [/INST]
     """
     logging.info("Chat history summary prompt created, using LLM to process")
-    return complete(st.session_state.model_name, prompt, session = st.session_state.session)
+    return complete(
+        st.session_state.model_name, prompt, session=st.session_state.session
+    )
 
 
 def create_prompt(user_question):
@@ -552,10 +581,12 @@ def create_prompt(user_question):
         chat_history = get_chat_history()
         if chat_history:
             question_summary = make_chat_history_summary(chat_history, user_question)
-            logging.info(f"Summary of the question: {question_summary}")  # Add log for summary
+            logging.info(
+                f"Summary of the question: {question_summary}"
+            )  # Add log for summary
             prompt_context, results = query_cortex_search_service(
                 question_summary,
-                columns=["chunk", "company_name"], # ADD COMPANY NAME
+                columns=["chunk", "company_name"],  # ADD COMPANY NAME
                 filter={},
             )
             logging.info("Chat history used and query processed.")
@@ -565,13 +596,15 @@ def create_prompt(user_question):
                 columns=["chunk", "company_name"],  # ADD COMPANY NAME
                 filter={},
             )
-            logging.info("No chat history found, using the current user question for query")
+            logging.info(
+                "No chat history found, using the current user question for query"
+            )
             chat_history = ""
     else:
         logging.info("Not using chat history.")
         prompt_context, results = query_cortex_search_service(
             user_question,
-            columns=["chunk", "company_name"],   # ADD COMPANY NAME
+            columns=["chunk", "company_name"],  # ADD COMPANY NAME
             filter={},
         )
         chat_history = ""
@@ -602,7 +635,6 @@ def create_prompt(user_question):
         """
 
     return prompt, results
-
 
 
 def landing_page():
@@ -799,6 +831,7 @@ def landing_page():
         unsafe_allow_html=True,
     )
 
+
 # Main function to handle page flow
 def main():
     """
@@ -826,9 +859,14 @@ def main():
         signup_page(st)
     else:
         # Corrected the multiple logging of the main page by checking if the page has changed in session.
-        if "previous_page" not in st.session_state or st.session_state.previous_page != "main":
+        if (
+            "previous_page" not in st.session_state
+            or st.session_state.previous_page != "main"
+        ):
             logging.info("Displaying main page.")
-            st.session_state.previous_page = "main" # Setting the previous page to main to avoid multiple logging.
+            st.session_state.previous_page = (
+                "main"  # Setting the previous page to main to avoid multiple logging.
+            )
         main_page()
 
 

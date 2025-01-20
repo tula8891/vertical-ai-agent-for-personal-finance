@@ -464,6 +464,7 @@ def query_cortex_search_service(query, columns=[], filter={}):
           .schemas[schema]
           .cortex_search_services[st.session_state.selected_cortex_search_service]
       )
+      logging.info(f"Selected cortex search service: {cortex_search_service}")
       # Changed to include all columns
       context_documents = cortex_search_service.search(
           query,

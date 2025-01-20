@@ -424,45 +424,26 @@ def init_config_options():
     Initialize the configuration options for the Streamlit application.
     """
     logging.info("Initializing config options.")
-    if "service_metadata" in st.session_state and st.session_state.service_metadata:
-        st.sidebar.selectbox(
-            "Select cortex search service:",
-            [s["name"] for s in st.session_state.service_metadata],
-            key="selected_cortex_search_service",
-        )
+
+    # Set the model name based on current section
+    if "current_section" in st.session_state:
+        if st.session_state.current_section == "financial_literacy":
+            st.session_state.model_name = "mistral-large2"
+            st.session_state.selected_cortex_search_service = "EDU_SERVICE"
+        else:  # investment or ai_agents
+            st.session_state.model_name = "mistral-large2"
+            st.session_state.selected_cortex_search_service = "FIN_SERVICE"
     else:
-        st.sidebar.selectbox(
-            "Select cortex search service:",
-            [],
-            key="selected_cortex_search_service",
-            disabled=True,
-            help="No Search Service available, check logs",
-        )
+        st.session_state.model_name = "mistral-large2"
+        st.session_state.selected_cortex_search_service = "EDU_SERVICE"
 
-    st.sidebar.button("Clear conversation", key="clear_conversation")
-    st.sidebar.toggle("Debug", key="debug", value=False)
-    st.sidebar.toggle("Use chat history", key="use_chat_history", value=True)
-
-    with st.sidebar.expander("Advanced options"):
-        st.selectbox("Select model:", MODELS, key="model_name")
-        st.number_input(
-            "Select number of context chunks",
-            value=5,
-            key="num_retrieved_chunks",
-            min_value=1,
-            max_value=10,
-        )
-        st.number_input(
-            "Select number of messages to use in chat history",
-            value=5,
-            key="num_chat_messages",
-            min_value=1,
-            max_value=10,
-        )
-    logging.info("Config options initialized.")
+    # Initialize other config options if not already set
+    if "use_chat_history" not in st.session_state:
+        st.session_state.use_chat_history = True
+    if "num_retrieved_chunks" not in st.session_state:
+        st.session_state.num_retrieved_chunks = 5
 
 
-# Corrected query_cortex_search_service function
 def query_cortex_search_service(query, columns=[], filter={}):
     """
     Perform a search query on the selected Cortex search service, including 'company_name' and 'chunk'.

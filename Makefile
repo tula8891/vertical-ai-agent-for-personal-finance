@@ -1,4 +1,4 @@
-.PHONY: help setup run format clean test test-coverage lint pre-commit release get-version test-imports force-commit
+.PHONY: help setup run format clean test test-coverage lint pre-commit release get-version test-imports force-commit dashboard
 
 # Python settings
 PYTHON := venv/bin/python
@@ -48,7 +48,11 @@ setup:
 
 # Run application
 run:
-	$(PYTHON) -m streamlit run streamlite_app.py
+	$(PYTHON) streamlite_app.py
+
+# Run the evaluation dashboard
+dashboard:
+	$(PYTHON) -m streamlit run evaluation_dashboard.py
 
 # Test imports
 test-imports:

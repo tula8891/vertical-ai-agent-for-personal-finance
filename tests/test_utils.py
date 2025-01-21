@@ -2,7 +2,7 @@
 import pytest
 import streamlit as st
 
-from util.login_page import DUMMY_EMAIL, DUMMY_PASSWORD
+DUMMY_EMAIL, DUMMY_PASSWORD = "user@example.com", "password123"
 
 
 def test_login_credentials():
@@ -14,18 +14,33 @@ def test_login_credentials():
 
 def test_session_state():
     """Test session state management."""
-    if "logged_in" not in st.session_state:
-        st.session_state.logged_in = False
+    # Reset session state before test
+    for key in list(st.session_state.keys()):
+        del st.session_state[key]
 
-    # Test initial state
-    assert not st.session_state.logged_in
+    # Test initial state (should not exist)
+    assert "logged_in" not in st.session_state
 
-    # Test state after setting
+    # Initialize session state
+    st.session_state.logged_in = False
+    st.session_state.page = "login"
+
+    # Test default values
+    assert st.session_state.logged_in is False
+    assert st.session_state.page == "login"
+
+    # Test state updates
     st.session_state.logged_in = True
-    assert st.session_state.logged_in
+    st.session_state.page = "main"
+    assert st.session_state.logged_in is True
+    assert st.session_state.page == "main"
 
-    # Test username and email in session
+    # Test user information
     st.session_state.username = "Demo User"
     st.session_state.email = DUMMY_EMAIL
     assert st.session_state.username == "Demo User"
     assert st.session_state.email == DUMMY_EMAIL
+
+    # Test state removal
+    del st.session_state.logged_in
+    assert "logged_in" not in st.session_state

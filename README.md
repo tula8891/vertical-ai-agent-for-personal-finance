@@ -1,4 +1,4 @@
-# ECONOGINIE: Personal Finance BRO
+# ECONOGENIE: Personal Finance BRO
 
 ## Overview
 
@@ -151,8 +151,10 @@ Demo_app/
 ├── .streamlit/         # Streamlit configuration
 ├── tests/             # Test suite
 ├── src/               # Source code
+│   ├── cortex/        # Cortex search and retrieval
 │   ├── evaluation/    # Evaluation modules
 │   ├── dashboard/     # Dashboard components
+│   ├── ui_components/ # Custom UI components
 │   └── utils/         # Utility functions
 ├── docs/              # Documentation
 └── config/            # Configuration files

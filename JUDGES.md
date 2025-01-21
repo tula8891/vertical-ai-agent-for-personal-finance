@@ -1,128 +1,117 @@
-# Snowflake Hackathon 2024 - Judges' Guide
+# Snowflake Hackathon 2024 - Evaluation Guide
 
 ## Project: Cortex Search Evaluation Framework
 
-### 1. Technological Implementation (25%)
+### Evaluation Criteria (25% each)
 
-#### Cortex Search & Mistral LLM Integration
-- Implemented semantic search using Snowflake's Cortex Search Service
-- Upgraded to Mistral Large 2 model for improved response quality
-- Built a robust RAG pipeline with context management
-- Integrated TruLens for comprehensive evaluation
+## 1. Technological Implementation
 
-#### Code Quality
-- Follows PEP 8 standards with strict type hints (PEP 484)
-- Comprehensive test suite with 80%+ coverage
-- Automated CI/CD pipeline with pre-commit hooks
-- Well-documented using Google style docstrings
+### Key Questions
+- Does the project demonstrate quality software development?
+- Does the project leverage the Cortex Search and Mistral LLM?
+- How is the quality of the code?
+- Is the quality of search results tested?
+- How effective is the search?
 
-#### Search Quality Testing
-- Automated evaluation pipeline using TruLens
-- Metrics tracked:
-  - Groundedness: 92% accuracy
-  - Context relevance: 89% precision
-  - Response latency: <500ms average
-  - Cost efficiency: 30% improvement
+### Implementation Notes
+Project implements:
+- Cortex Search Service integration
+- Mistral Large 2 LLM
+- RAG pipeline
+- TruLens evaluation framework
+- Automated testing suite
+- CI/CD pipeline
 
-#### Search Effectiveness
-- Enhanced context retrieval with configurable parameters
-- Intelligent chat history management
-- Query optimization for improved accuracy
-- Real-time performance monitoring
+### Judge's Notes
+_____________________________________________________
+_____________________________________________________
+_____________________________________________________
+_____________________________________________________
 
-### 2. Design (25%)
+## 2. Design
 
-#### User Experience
-- Clean, intuitive Streamlit dashboard
-- Real-time metrics visualization
-- Interactive query analysis
-- Responsive design across devices
+### Key Questions
+- Is the user experience and design well thought out?
+- How well is the document ingestion and search implemented?
+- How thoughtful is the usage of the LLM?
 
-#### Document Processing
-- Efficient document ingestion pipeline
-- Automated metadata extraction
-- Configurable preprocessing steps
-- Version control for document updates
+### Design Elements
+- Streamlit dashboard interface
+- Document processing pipeline
+- Search optimization features
+- Real-time metrics display
 
-#### LLM Usage Optimization
-- Context-aware prompt engineering
-- Dynamic temperature adjustment
-- Token optimization for cost efficiency
-- Fallback strategies for robustness
+### Judge's Notes
+_____________________________________________________
+_____________________________________________________
+_____________________________________________________
+_____________________________________________________
 
-### 3. Potential Impact (25%)
+## 3. Potential Impact
 
-#### Business Value
-- Enables data-driven LLM optimization
-- Reduces operational costs through efficiency
-- Improves search quality systematically
-- Facilitates A/B testing of models
+### Key Questions
+- How big of an impact could the project have?
+- What problems does it solve?
+- How scalable is the solution?
 
-#### Scalability
-- Handles large-scale document collections
-- Supports multiple concurrent evaluations
-- Cloud-ready architecture
-- Modular design for easy extension
+### Impact Areas
+- Search quality optimization
+- Cost efficiency
+- Development productivity
+- Quality assurance
 
-#### Industry Applications
-- Enterprise search optimization
-- Customer support enhancement
-- Knowledge base management
-- Research and development acceleration
+### Judge's Notes
+_____________________________________________________
+_____________________________________________________
+_____________________________________________________
+_____________________________________________________
 
-### 4. Quality of the Idea (25%)
+## 4. Quality of the Idea
 
-#### Innovation
-- First comprehensive evaluation framework for Cortex Search
-- Novel integration of TruLens with Snowflake
-- Real-time performance optimization
-- Automated quality assurance
+### Key Questions
+- How creative and unique is the project?
+- Does the concept exist already?
+- How much does it improve on existing solutions?
 
-#### Differentiation
-- Existing solutions lack:
-  - Real-time evaluation capabilities
-  - Integrated TruLens metrics
-  - Cost optimization features
-  - Automated performance tuning
+### Innovation Aspects
+- Evaluation framework for Cortex Search
+- TruLens integration
+- Real-time optimization
+- Automated quality metrics
 
-#### Improvements Over Existing Solutions
-1. **Quality Assessment**
-   - Automated groundedness checking
-   - Context relevance scoring
-   - Response quality metrics
+### Judge's Notes
+_____________________________________________________
+_____________________________________________________
+_____________________________________________________
+_____________________________________________________
 
-2. **Performance Optimization**
-   - Real-time monitoring
-   - Automated tuning
-   - Cost tracking
+## TruLens Bonus Prize Consideration
 
-3. **User Experience**
-   - Interactive dashboard
-   - Detailed analytics
-   - Easy configuration
+### Implementation
+- TruLens integration for evaluation
+- Experiment comparison capability
+- Performance optimization features
 
-### TruLens Bonus Prize Submission
+### Evaluation Areas
+- Search quality metrics
+- Response effectiveness
+- System performance
+- Cost optimization
 
-#### Experiment Comparison
-1. **Model Evaluation**
-   - Mistral Large 2 vs llama2-70b-chat
-   - Performance metrics comparison
-   - Cost-benefit analysis
+### Judge's Notes
+_____________________________________________________
+_____________________________________________________
+_____________________________________________________
+_____________________________________________________
 
-2. **Optimization Metrics**
-   - Response quality (groundedness)
-   - Context relevance
-   - Cost efficiency
-   - Response latency
+## Additional Comments
+_____________________________________________________
+_____________________________________________________
+_____________________________________________________
+_____________________________________________________
 
-3. **Results**
-   - 30% cost reduction
-   - 15% quality improvement
-   - 40% latency reduction
-   - 92% search accuracy
-
-### Project Links
-- Demo: [Streamlit Cloud Link]
-- Repository: [GitHub Repository]
-- Documentation: [Project Documentation]
-- Video Demo: [YouTube Link]
+## Overall Assessment
+_____________________________________________________
+_____________________________________________________
+_____________________________________________________
+_____________________________________________________

@@ -48,7 +48,7 @@ setup:
 
 # Run application
 run:
-	$(PYTHON) streamlite_app.py
+	$(PYTHON) -m streamlit run streamlite_app.py
 
 # Run the evaluation dashboard
 dashboard:

@@ -450,31 +450,8 @@ def create_prompt(user_question):
     chat_history = get_chat_history()
     section = st.session_state.current_section
 
-    # Define base prompts for each section
-    base_prompts = {
-        "financial_literacy": """You are a financial education expert. Focus on:
-            1. Clear explanations of financial concepts
-            2. Building financial literacy
-            3. Educational examples
-            4. Beginner-friendly language
-            5. Explaining technical terms when used""",
-        "investment": """You are a personalized investment advisor. Focus on:
-            1. Risk-appropriate recommendations
-            2. Portfolio diversification
-            3. Market analysis
-            4. Investment strategies
-            5. Clear risk disclosures""",
-        "ai_agents": """You are an AI-powered financial analysis agent using Mistral. Focus on:
-            1. Advanced market insights
-            2. Data-driven analysis
-            3. Trend predictions
-            4. Risk assessment
-            5. Complex financial modeling
-            Note: Always remind users this is a beta feature requiring verification.""",
-    }
-
-    # Get the appropriate base prompt
-    base_prompt = base_prompts.get(section, base_prompts["financial_literacy"])
+    # Get the appropriate base prompt 
+    base_prompt = st.secrets["base_prompts"].get(section, st.secrets["base_prompts"][section])
 
     if st.session_state.use_chat_history and chat_history:
         # Create context-aware prompt
@@ -919,7 +896,7 @@ def main():
         landing_page()
     elif st.session_state.page == "login":
         logging.info("Displaying login page.")
-        login_page(st)
+        login_page(st, st.secrets["cred"]["email"], st.secrets["cred"]["password"])
     elif st.session_state.page == "signup":
         logging.info("Displaying signup page.")
         signup_page(st)

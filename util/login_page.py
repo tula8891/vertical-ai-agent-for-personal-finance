@@ -1,10 +1,8 @@
 # Login page function with a single column layout
-# Dummy credentials for login
-DUMMY_EMAIL = "user@example.com"
-DUMMY_PASSWORD = "password123"
 
 
-def login_page(st):
+
+def login_page(st, email_user, password_user):
     """Render the login page of the Streamlit application."""
 
     # Center-aligned container
@@ -16,14 +14,16 @@ def login_page(st):
 
         # Login form
         with st.form("login_form", clear_on_submit=True):
-            email = st.text_input("Email", placeholder="Enter your email")
+            email = st.text_input("Email", placeholder="user@example.com")
+            st.write("Email: user@example.com")
             password = st.text_input(
-                "Password", type="password", placeholder="Enter your password"
+                "Password", type="password", placeholder="password123"
             )
+            st.write("Password: password123")
 
             # Full-width login button
             if st.form_submit_button("Login", use_container_width=True):
-                if email == DUMMY_EMAIL and password == DUMMY_PASSWORD:
+                if email == email_user and password == password_user:
                     st.session_state.logged_in = True
                     st.session_state.username = "Demo User"
                     st.session_state.email = email
@@ -36,3 +36,4 @@ def login_page(st):
         st.write("Don't have an account?")
         if st.button("Sign Up", use_container_width=True):
             st.session_state.page = "signup"
+            

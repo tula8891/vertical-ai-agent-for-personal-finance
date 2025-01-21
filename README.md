@@ -252,3 +252,36 @@ MIT License - see [LICENSE](LICENSE) for details.
 - TruLens Team
 - Streamlit Team
 - DevPost Team
+
+## Frequently Asked Questions (FAQ)
+
+### 1. **What is the company’s market share in its industry?**
+
+**Use Case**:  
+When analyzing a company, an investor might want to understand how much of the market the company controls compared to its competitors. For example, if you’re considering investing in a tech company, knowing its market share in the AI chip sector (like NVIDIA's) could give you a sense of its industry dominance.
+
+
+### 2. **How is the company adapting to changes in its industry (e.g., new technology, regulatory changes)?**
+
+**Use Case**:  
+Imagine you’re reviewing a company in the electric vehicle (EV) industry. You might want to know how the company is responding to new regulations around emissions or adopting new battery technologies to stay competitive.
+
+
+### 3. **Is the company targeting emerging markets for growth?**
+
+**Use Case**:  
+If you're looking into a company like Coca-Cola, you might want to understand if they’re planning to expand into emerging markets like Africa or Southeast Asia. This could help you assess their potential for future revenue growth.
+
+
+### 4. **What are the risks that the company faces from industry competition?**
+
+**Use Case**:  
+Consider an investor researching a software company. They may want to know if the company is at risk of being overtaken by a new startup offering innovative solutions or if the company has barriers to entry that protect it.
+
+
+### 5. **How does the company plan to stay competitive in its industry over the next 3-5 years?**
+
+**Use Case**:  
+For example, an investor may be interested in how a cloud computing company plans to stay ahead of AWS, Microsoft Azure, and Google Cloud in the rapidly evolving industry. The company’s plans for future product launches, technological advancements, or market diversification could provide key insights.
+
+

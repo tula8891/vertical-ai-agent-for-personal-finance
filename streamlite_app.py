@@ -507,7 +507,7 @@ def init_service_metadata():
         }
 
         st.session_state.service_metadata = [edu_service, fin_service]
-        logging.info(f"Service metadata initialized: {st.session_state.service_metadata}")
+        logging.info(f"Service metadata initialized")
 
         # Set default service based on current section
         if "current_section" in st.session_state:
@@ -554,14 +554,13 @@ def query_cortex_search_service(query, columns=[], filter={}):
     """
     Perform a search query on the selected Cortex search service.
     """
-    logging.info(f"Querying cortex search service with query: {query}, columns: {columns}, filter: {filter}")
+    logging.info(f"Querying cortex search service with query: {query}")
     try:
         if not hasattr(st.session_state, "cortex_search_service"):
-            logging.error("Cortex search service not initialized")
+            logging.error("search service not initialized")
             return "", []
 
         cortex_search_service = st.session_state.cortex_search_services[st.session_state.selected_cortex_search_service]
-        logging.info(f"Selected cortex search service: {cortex_search_service}")
 
         # Query the search service
         search_response = cortex_search_service.search(
@@ -602,7 +601,7 @@ def complete(model, prompt, session=None):
     """
     Generate a completion response using the specified model and prompt.
     """
-    logging.info(f"Generating completion with model: {model}, prompt: {prompt}")
+    logging.info(f"Generating completion with model: {model}")
     try:
         response = Complete(model, prompt, session=session).replace("$", "\$")
         logging.info("Completion generated successfully.")

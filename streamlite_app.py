@@ -51,15 +51,15 @@ st.markdown(
 )
 
 
-# Helper function to initialize the Snowflake session once
+# Helper function to initialize the  session once
 def initialize_session():
     """
-    Initialize a Snowflake session for the Streamlit application.
+    Initialize a  session for the Streamlit application.
     """
-    logging.info("Initializing Snowflake session.")
+    logging.info("Initializing  session.")
     if "session" not in st.session_state:
         logging.info(
-            "Snowflake session not found in session state, creating a new one."
+            " session not found in session state, creating a new one."
         )
         connection_params = {
             "account": st.secrets["myconnection"]["account"],
@@ -73,13 +73,13 @@ def initialize_session():
             st.session_state.session = Session.builder.configs(
                 connection_params
             ).create()
-            logging.info("Snowflake session created successfully.")
+            logging.info("session created successfully.")
         except Exception as e:
-            logging.error(f"Error creating Snowflake session: {e}")
-            st.error("Failed to connect to Snowflake. Please check your credentials.")
+            logging.error(f"Error creating  session: {e}")
+            st.error("Failed to connect to session. Please check your credentials.")
             return None
     else:
-        logging.info("Snowflake session found in session state.")
+        logging.info("session found in session state.")
     return st.session_state.session
 
 
@@ -466,31 +466,9 @@ def create_prompt(user_question):
     chat_history = get_chat_history()
     section = st.session_state.current_section
 
-    # Define base prompts for each section
-    base_prompts = {
-        "financial_literacy": """You are a financial education expert. Focus on:
-            1. Clear explanations of financial concepts
-            2. Building financial literacy
-            3. Educational examples
-            4. Beginner-friendly language
-            5. Explaining technical terms when used""",
-        "investment": """You are a personalized investment advisor. Focus on:
-            1. Risk-appropriate recommendations
-            2. Portfolio diversification
-            3. Market analysis
-            4. Investment strategies
-            5. Clear risk disclosures""",
-        "ai_agents": """You are an AI-powered financial analysis agent using Mistral. Focus on:
-            1. Advanced market insights
-            2. Data-driven analysis
-            3. Trend predictions
-            4. Risk assessment
-            5. Complex financial modeling
-            Note: Always remind users this is a beta feature requiring verification.""",
-    }
-
-    # Get the appropriate base prompt
-    base_prompt = base_prompts.get(section, base_prompts["financial_literacy"])
+   
+    # Get the appropriate base prompt 
+    base_prompt = st.secrets["base_prompts"].get(section, st.secrets["base_prompts"][section])
 
     if st.session_state.use_chat_history and chat_history:
         # Create context-aware prompt
@@ -527,7 +505,7 @@ def create_prompt(user_question):
 
 def init_service_metadata():
     """
-    Initialize service metadata for the Snowflake Cortex search services.
+    Initialize service metadata for the  Cortex search services.
     """
     logging.info("Initializing service metadata.")
     if "service_metadata" not in st.session_state:
@@ -550,9 +528,6 @@ def init_service_metadata():
         }
 
         st.session_state.service_metadata = [edu_service, fin_service]
-        logging.info(
-            f"Service metadata initialized: {st.session_state.service_metadata}"
-        )
 
         # Set default service based on current section
         if "current_section" in st.session_state:
@@ -600,7 +575,7 @@ def query_cortex_search_service(query, columns=[], filter={}):
     Perform a search query on the selected Cortex search service.
     """
     logging.info(
-        f"Querying cortex search service with query: {query}, columns: {columns}, filter: {filter}"
+        f"Querying service with query: {query}"
     )
     try:
         if not hasattr(st.session_state, "cortex_search_service"):
@@ -651,7 +626,7 @@ def complete(model, prompt, session=None):
     """
     Generate a completion response using the specified model and prompt.
     """
-    logging.info(f"Generating completion with model: {model}, prompt: {prompt}")
+    logging.info(f"Generating completion with model: {model}")
     try:
         response = Complete(model, prompt, session=session).replace("$", "\$")
         logging.info("Completion generated successfully.")
@@ -903,7 +878,7 @@ def main():
         landing_page()
     elif st.session_state.page == "login":
         logging.info("Displaying login page.")
-        login_page(st)
+        login_page(st, st.secrets["cred"]["email"], st.secrets["cred"]["password"])
     elif st.session_state.page == "signup":
         logging.info("Displaying signup page.")
         signup_page(st)

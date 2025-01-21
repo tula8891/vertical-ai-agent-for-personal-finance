@@ -145,4 +145,4 @@ get-version:
 
 # Force commit (skip pre-commit hooks)
 force-commit:
-	SKIP=flake8,black,mypy git commit -m "$(shell git log -1 --pretty=%B)"
+	SKIP=flake8,black,mypy,trailing-whitespace git commit -m "$(shell git log -1 --pretty=%B)"

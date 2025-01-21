@@ -31,11 +31,19 @@ sys.modules["snowflake.cortex"] = mock_snowflake.cortex
 sys.modules["snowflake.snowpark"] = mock_snowflake.snowpark
 sys.modules["snowflake.snowpark.context"] = mock_snowflake.snowpark.context
 
-from streamlite_app import (complete, create_prompt, get_chat_history,
-                            init_config_options, init_messages,
-                            init_service_metadata, initialize_session, main,
-                            main_page, make_chat_history_summary,
-                            query_cortex_search_service)
+from streamlite_app import (
+    complete,
+    create_prompt,
+    get_chat_history,
+    init_config_options,
+    init_messages,
+    init_service_metadata,
+    initialize_session,
+    main,
+    main_page,
+    make_chat_history_summary,
+    query_cortex_search_service,
+)
 
 
 class TestStreamliteApp(unittest.TestCase):

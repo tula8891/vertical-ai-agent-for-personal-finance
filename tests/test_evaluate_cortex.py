@@ -10,8 +10,7 @@ from snowflake.snowpark import Session
 from trulens.connectors.snowflake import SnowflakeConnector
 from trulens.core import TruSession
 
-from evaluate_cortex import (CortexSearchRetriever, RAG_from_scratch,
-                             connection_params)
+from evaluate_cortex import CortexSearchRetriever, RAG_from_scratch, connection_params
 
 
 @pytest.fixture

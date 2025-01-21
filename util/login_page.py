@@ -28,7 +28,7 @@ def login_page(st, email_user, password_user):
                     st.session_state.username = "Demo User"
                     st.session_state.email = email
                     st.session_state.page = "main"
-                    st.success("Login successful!")
+                    st.success("Your credentials are valid! Please click the login button again to proceed")
                 else:
                     st.error("Invalid credentials. Please try again.")
 

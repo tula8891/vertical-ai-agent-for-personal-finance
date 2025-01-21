@@ -1,6 +1,7 @@
-# Snowflake Hackathon 2024 - Evaluation Guide
+## RAG 'n' ROLL Amp up Search with Snowflake & Mistral
+Push the boundaries of AI Search with Cortex Search, Mistral LLM, and Streamlit Community Cloud
 
-## Project: Cortex Search Evaluation Framework
+Hackathon URL: https://snowflake-mistral-rag.devpost.com/
 
 ### Evaluation Criteria (25% each)
 
@@ -8,6 +9,7 @@
 
 ### Key Questions
 - Does the project demonstrate quality software development?
+- Is the project structured effectively?
 - Does the project leverage the Cortex Search and Mistral LLM?
 - How is the quality of the code?
 - Is the quality of search results tested?

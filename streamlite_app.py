@@ -10,9 +10,7 @@ from util.login_page import login_page
 from util.signup_page import signup_page
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 # Define the model to use
 MODEL_NAME = "mistral-large2"
@@ -58,9 +56,13 @@ def initialize_session():
     """
     logging.info("Initializing  session.")
     if "session" not in st.session_state:
+<<<<<<< HEAD
         logging.info(
             " session not found in session state, creating a new one."
         )
+=======
+        logging.info("Snowflake session not found in session state, creating a new one.")
+>>>>>>> ce6bb632ae8d6b7190ee939f1d5b567b62876d14
         connection_params = {
             "account": st.secrets["myconnection"]["account"],
             "user": st.secrets["myconnection"]["user"],
@@ -70,10 +72,15 @@ def initialize_session():
             "schema": st.secrets["myconnection"]["schema"],
         }
         try:
+<<<<<<< HEAD
             st.session_state.session = Session.builder.configs(
                 connection_params
             ).create()
             logging.info("session created successfully.")
+=======
+            st.session_state.session = Session.builder.configs(connection_params).create()
+            logging.info("Snowflake session created successfully.")
+>>>>>>> ce6bb632ae8d6b7190ee939f1d5b567b62876d14
         except Exception as e:
             logging.error(f"Error creating  session: {e}")
             st.error("Failed to connect to session. Please check your credentials.")
@@ -131,12 +138,29 @@ def main_page():
         st.caption("Personal Finance BRO")
     with nav_col3:
         if st.button("🚪 Logout", type="secondary", use_container_width=True):
-            logging.info(
-                "Logout button clicked. Clearing session state and redirecting to login page."
-            )
+            logging.info("Logout button clicked. Clearing session state and redirecting to login page.")
             st.session_state.clear()
             st.session_state.page = "login"
             st.rerun()
+
+    st.markdown("---")
+
+    # Welcome message
+    st.markdown("## Welcome to Econo Genie")
+    st.markdown(
+        """
+        <div style='padding: 1rem; border-radius: 10px; background-color: #FFFFFF;'>
+            <p style='font-size: 1.1rem; color: #A18249; margin-bottom: 1rem;'>
+                <strong>Did you know?</strong>
+            </p>
+            <ul style='color: #1C160C; font-size: 1.1rem; line-height: 1.6;'>
+                <li>$243 billion lost nationwide in 2024 due to financial ignorance, with the average American losing $1,015.</li>
+                <li>$14 billion in late fees charged by credit card issuers in 2022, over 10% of total interest and fees.</li>
+            </ul>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     st.markdown("---")
 
@@ -208,9 +232,7 @@ def main_page():
             st.session_state.financial_goals = goals
         if "investment_horizon" not in st.session_state:
             st.session_state.investment_horizon = horizon
-        logging.info(
-            f"User profile - Risk: {risk_profile}, Goals: {goals}, Horizon: {horizon}"
-        )
+        logging.info(f"User profile - Risk: {risk_profile}, Goals: {goals}, Horizon: {horizon}")
 
     st.markdown("---")
 
@@ -221,16 +243,12 @@ def main_page():
 
         st.markdown("---")
 
-        if st.button(
-            "📚 Financial Literacy", use_container_width=True, key="sidebar_fin_lit"
-        ):
+        if st.button("📚 Financial Literacy", use_container_width=True, key="sidebar_fin_lit"):
             logging.info("Sidebar button 'Financial Literacy' clicked.")
             st.session_state.current_section = "financial_literacy"
             st.rerun()
 
-        if st.button(
-            "💰 Personalized Investment", use_container_width=True, key="sidebar_invest"
-        ):
+        if st.button("💰 Personalized Investment", use_container_width=True, key="sidebar_invest"):
             logging.info("Sidebar button 'Personalized Investment' clicked.")
             st.session_state.current_section = "investment"
             st.rerun()
@@ -257,9 +275,7 @@ def main_page():
             unsafe_allow_html=True,
         )
         if st.button("🚪 Logout", key="sidebar_logout"):
-            logging.info(
-                "Sidebar logout button clicked, logging out user and navigating to landing page"
-            )
+            logging.info("Sidebar logout button clicked, logging out user and navigating to landing page")
             st.session_state.clear()
             st.session_state.page = "landing"
             st.rerun()
@@ -311,14 +327,9 @@ def main_page():
         - Real-time assistance
         """
         )
-        st.warning(
-            "This is a beta feature. Recommendations should be verified with a financial advisor."
-        )
+        st.warning("This is a beta feature. Recommendations should be verified with a financial advisor.")
         # AI Agents Chat Interface
         display_chat_interface("ai_agent", "Ask for AI-powered analysis...")
-
-    # Display a welcome message
-    st.write("Welcome to the main page!")
 
     # Initialize session state variables if not set
     init_service_metadata()
@@ -360,17 +371,11 @@ def display_chat_interface(feature_key, placeholder_text):
 
         # Add to feature-specific history
         if feature_key == "fin_lit":
-            st.session_state.fin_lit_messages.append(
-                {"role": "user", "content": question}
-            )
+            st.session_state.fin_lit_messages.append({"role": "user", "content": question})
         elif feature_key == "investment":
-            st.session_state.investment_messages.append(
-                {"role": "user", "content": question}
-            )
+            st.session_state.investment_messages.append({"role": "user", "content": question})
         else:  # ai_agent
-            st.session_state.ai_agent_messages.append(
-                {"role": "user", "content": question}
-            )
+            st.session_state.ai_agent_messages.append({"role": "user", "content": question})
 
         # Generate response
         with st.chat_message("assistant", avatar=icons["assistant"]):
@@ -386,9 +391,7 @@ def display_chat_interface(feature_key, placeholder_text):
 
                     # Add citations if available
                     if results:
-                        markdown_table = (
-                            "###### References \n\n| Content |\n|--------|\n"
-                        )
+                        markdown_table = "###### References \n\n| Content |\n|--------|\n"
                         for result in results:
                             if isinstance(result, dict) and "CHUNK" in result:
                                 chunk = result["CHUNK"]
@@ -403,17 +406,11 @@ def display_chat_interface(feature_key, placeholder_text):
 
                     # Add to feature-specific history
                     if feature_key == "fin_lit":
-                        st.session_state.fin_lit_messages.append(
-                            {"role": "assistant", "content": generated_response}
-                        )
+                        st.session_state.fin_lit_messages.append({"role": "assistant", "content": generated_response})
                     elif feature_key == "investment":
-                        st.session_state.investment_messages.append(
-                            {"role": "assistant", "content": generated_response}
-                        )
+                        st.session_state.investment_messages.append({"role": "assistant", "content": generated_response})
                     else:  # ai_agent
-                        st.session_state.ai_agent_messages.append(
-                            {"role": "assistant", "content": generated_response}
-                        )
+                        st.session_state.ai_agent_messages.append({"role": "assistant", "content": generated_response})
 
             except Exception as e:
                 error_msg = "An error occurred while processing your request."
@@ -473,14 +470,10 @@ def create_prompt(user_question):
     if st.session_state.use_chat_history and chat_history:
         # Create context-aware prompt
         question_summary = make_chat_history_summary(chat_history, user_question)
-        prompt_context, results = query_cortex_search_service(
-            question_summary, columns=["CHUNK"], filter={}
-        )
+        prompt_context, results = query_cortex_search_service(question_summary, columns=["CHUNK"], filter={})
     else:
         # Create standalone prompt
-        prompt_context, results = query_cortex_search_service(
-            user_question, columns=["CHUNK"], filter={}
-        )
+        prompt_context, results = query_cortex_search_service(user_question, columns=["CHUNK"], filter={})
 
     # Combine into final prompt
     final_prompt = f"""[INST]
@@ -528,6 +521,10 @@ def init_service_metadata():
         }
 
         st.session_state.service_metadata = [edu_service, fin_service]
+<<<<<<< HEAD
+=======
+        logging.info(f"Service metadata initialized: {st.session_state.service_metadata}")
+>>>>>>> ce6bb632ae8d6b7190ee939f1d5b567b62876d14
 
         # Set default service based on current section
         if "current_section" in st.session_state:
@@ -574,17 +571,19 @@ def query_cortex_search_service(query, columns=[], filter={}):
     """
     Perform a search query on the selected Cortex search service.
     """
+<<<<<<< HEAD
     logging.info(
         f"Querying service with query: {query}"
     )
+=======
+    logging.info(f"Querying cortex search service with query: {query}, columns: {columns}, filter: {filter}")
+>>>>>>> ce6bb632ae8d6b7190ee939f1d5b567b62876d14
     try:
         if not hasattr(st.session_state, "cortex_search_service"):
             logging.error("Cortex search service not initialized")
             return "", []
 
-        cortex_search_service = st.session_state.cortex_search_services[
-            st.session_state.selected_cortex_search_service
-        ]
+        cortex_search_service = st.session_state.cortex_search_services[st.session_state.selected_cortex_search_service]
         logging.info(f"Selected cortex search service: {cortex_search_service}")
 
         # Query the search service
@@ -657,9 +656,7 @@ def make_chat_history_summary(chat_history, question):
         [/INST]
     """
     logging.info("Chat history summary prompt created, using LLM to process")
-    return complete(
-        st.session_state.model_name, prompt, session=st.session_state.session
-    )
+    return complete(st.session_state.model_name, prompt, session=st.session_state.session)
 
 
 def landing_page():
@@ -711,10 +708,39 @@ def landing_page():
         unsafe_allow_html=True,
     )
 
+    # Landing page header
+    st.markdown(
+        """
+        <style>
+            .landing-header {
+                text-align: center;
+                padding: 2rem 0;
+            }
+            .welcome-stats {
+                padding: 1rem;
+                border-radius: 10px;
+                background-color: #FFFFFF;
+                margin: 1rem 0;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # Landing page header
+    st.markdown(
+        """
+        <div class='landing-header'>
+            <h1>Welcome to Econo Genie <span style='font-size: 1.5rem;'>🧞‍♂️</span></h1>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
     # Navigation Bar
     col1, col2, col3, col4, col5 = st.columns([4, 2, 2, 2, 2])
     with col1:
-        st.markdown("### Econo Genie")
+        st.markdown("### Econo Genie 🧞‍♂️", unsafe_allow_html=True)
     with col3:
         if st.button("Home", key="nav_home_btn", use_container_width=True):
             logging.info("Landing page button 'Home' clicked.")
@@ -753,6 +779,23 @@ def landing_page():
         """,
         unsafe_allow_html=True,
     )
+    # welcome message
+    st.markdown(
+        """
+        <div class='welcome-stats'>
+            <p style='font-size: 1.1rem; color: #A18249; margin-bottom: 1rem;'>
+                <strong>Did you know? <span style='font-size: 1.5rem;'>🧞‍♂️</span></strong>
+            </p>
+            <ul style='color: #1C160C; font-size: 1.1rem; line-height: 1.6;'>
+                <li>$243 billion lost nationwide in 2024 due to financial ignorance, with the average American losing $1,015.</li>
+                <li>$14 billion in late fees charged by credit card issuers in 2022, over 10% of total interest and fees.</li>
+            </ul>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown("---")
 
     # Personalized Investment Recommendations Section
     st.markdown("## Personalized Investment Recommendations")
@@ -783,9 +826,7 @@ def landing_page():
     )
     col1, col2, col3 = st.columns([12, 5, 4])
     with col2:
-        if st.button(
-            "Explore now", key="explore_financial_literacy", use_container_width=True
-        ):
+        if st.button("Explore now", key="explore_financial_literacy", use_container_width=True):
             logging.info("Landing page button 'Explore now' (fin lit) clicked.")
             st.session_state.page = "signup"
             st.rerun()
@@ -884,14 +925,9 @@ def main():
         signup_page(st)
     else:
         # Corrected the multiple logging of the main page by checking if the page has changed in session.
-        if (
-            "previous_page" not in st.session_state
-            or st.session_state.previous_page != "main"
-        ):
+        if "previous_page" not in st.session_state or st.session_state.previous_page != "main":
             logging.info("Displaying main page.")
-            st.session_state.previous_page = (
-                "main"  # Setting the previous page to main to avoid multiple logging.
-            )
+            st.session_state.previous_page = "main"  # Setting the previous page to main to avoid multiple logging.
         main_page()
 
 

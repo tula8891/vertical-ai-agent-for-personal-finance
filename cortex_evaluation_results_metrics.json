@@ -1,0 +1,34 @@
+{
+  "timestamps": [
+    "2025-01-20T20:44:54.874205",
+    "2025-01-20T20:45:06.770138"
+  ],
+  "queries": [
+    "What is financial literacy?",
+    "what are the key factors in financial literacy?"
+  ],
+  "responses": [
+    " Financial literacy refers to the ability of individuals to understand and make informed decisions about their financial affairs. It encompasses knowledge and understanding of financial concepts, such as budgeting, saving, investing, and managing debt, as well as the skills needed to apply this knowledge in practical ways. The Consumer Financial Protection Bureau (CFPB) provides resources and information to help consumers improve their financial literacy and make better financial decisions.",
+    " The key factors in financial literacy, according to the Consumer Financial Protection Bureau's report, include:\n\n1. Understanding credit scores and how they are used by lenders to determine creditworthiness.\n2. Knowing how to manage credit card debt and avoid overspending.\n3. Having a basic understanding of personal finance, including budgeting, saving, and investing.\n4. Being aware of the costs and terms of credit cards and other financial products.\n5. Understanding how to shop for and compare financial products, such as credit cards and loans.\n6. Having a plan for saving and paying for large purchases, such as a down payment on a home.\n7. Being mindful of the impact of credit card rewards and other incentives on spending habits.\n8. Avoiding fraud and scams by being cautious with personal financial information.\n9. Having a solid understanding of credit reports and credit scores, and how they affect creditworthiness.\n10. Being aware of the potential risks and consequences of using credit, such as high interest rates and fees.\n\nBy understanding these key factors, individuals can make informed decisions about their financial affairs and avoid common pitfalls that can lead to debt and financial insecurity."
+  ],
+  "latencies": [
+    4.458205223083496,
+    10.711905002593994
+  ],
+  "costs": [
+    0.0,
+    0.0
+  ],
+  "groundedness_scores": [
+    0.0,
+    0.0
+  ],
+  "context_relevance_scores": [
+    0.0,
+    0.0
+  ],
+  "answer_relevance_scores": [
+    0.0,
+    0.0
+  ]
+}

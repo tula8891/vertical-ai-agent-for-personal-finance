@@ -1,24 +1,62 @@
+import logging
+
 import streamlit as st
-from snowflake.core import Root # requires snowflake>=0.8.0
+from snowflake.core import Root
 from snowflake.cortex import Complete
-from snowflake.snowpark.context import get_active_session
 from snowflake.snowpark import Session
 
-"""
-The available models are subject to change. Check the model availability for the REST API:
-https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-llm-rest-api#model-availability
-"""
-MODELS = [
-    "mistral-large2",
-    "llama3.1-70b",
-    "llama3.1-8b",
-]
+# Import utility functions
+from util.login_page import login_page
+from util.signup_page import signup_page
 
+# Configure logging
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
+# Define the model to use
+MODEL_NAME = "mistral-large2"
+
+# Define chat icons/avatars
+icons = {"user": "👤", "assistant": "🤖", "system": "ℹ️"}
+
+# Configure Streamlit page settings
+st.set_page_config(
+    page_title="IMMI App",
+    page_icon="💰",
+    layout="centered",
+    initial_sidebar_state="expanded",
+)
+
+# Use Streamlit's built-in theme configuration
+st.markdown(
+    """
+    <style>
+        /* Minimal custom styling */
+        .stButton>button {
+            width: 100%;
+            margin-top: 1rem;
+        }
+        .stForm {
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+        /* Hide Streamlit branding */
+        #MainMenu {visibility: hidden;}
+        footer {visibility: hidden;}
+        header {visibility: hidden;}
+    </style>
+""",
+    unsafe_allow_html=True,
+)
+
+
+# Helper function to initialize the Snowflake session once
 def initialize_session():
     """
     Initialize a Snowflake session for the Streamlit application.
     """
+    logging.info("Initializing Snowflake session.")
     if "session" not in st.session_state:
+        logging.info("Snowflake session not found in session state, creating a new one.")
         connection_params = {
             "account": st.secrets["rag_connection"]["account"],
             "user": st.secrets["rag_connection"]["user"],
@@ -29,167 +67,418 @@ def initialize_session():
         }
         try:
             st.session_state.session = Session.builder.configs(connection_params).create()
+            logging.info("Snowflake session created successfully.")
         except Exception as e:
-            st.error(f"Failed to connect to Snowflake. Error details: {str(e)}")
-            st.write("Connection parameters used (password hidden):")
-            safe_params = {k:v if k != 'password' else '****' for k,v in connection_params.items()}
-            st.write(safe_params)
+            logging.error(f"Error creating Snowflake session: {e}")
+            st.error("Failed to connect to Snowflake. Please check your credentials.")
             return None
     else:
-        pass
+        logging.info("Snowflake session found in session state.")
     return st.session_state.session
 
+
+# Main page function
+def main_page():
+    """
+    Main page of the Streamlit application.
+    """
+    logging.info("Displaying main page.")
+
+    # Custom CSS for sidebar
+    st.markdown(
+        """
+        <style>
+        .sidebar-button {
+            background-color: #4B8BBE;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.5rem 1rem;
+            margin: 0.5rem 0;
+            width: 100%;
+            text-align: left;
+        }
+        .sidebar .stButton>button {
+            background-color: #4B8BBE;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            width: 100%;
+            margin: 4px 0;
+            text-align: left;
+            font-size: 16px;
+        }
+        .sidebar .stButton>button:hover {
+            background-color: #3D7BA8;
+            border: none;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # Add navigation bar with improved spacing
+    nav_col1, nav_col2, nav_col3 = st.columns([6, 2, 2])
+    with nav_col1:
+        st.title("Immi App")
+        st.caption("Immigration Assistant")
+    with nav_col3:
+        if st.button("🚪 Logout", type="secondary", use_container_width=True):
+            logging.info("Logout button clicked. Clearing session state and redirecting to login page.")
+            st.session_state.clear()
+            st.session_state.page = "login"
+            st.rerun()
+
+    st.markdown("---")
+
+    # Welcome message
+    st.markdown("## Welcome to Immigration Assistant")
+    st.markdown(
+        """
+        <div style='padding: 1rem; border-radius: 10px; background-color: #FFFFFF;'>
+            <p style='font-size: 1.1rem; color: #A18249; margin-bottom: 1rem;'>
+                <strong>Did you know?</strong>
+            </p>
+            <ul style='color: #1C160C; font-size: 1.1rem; line-height: 1.6;'>
+                <li>$243 billion lost nationwide in 2024 due to financial ignorance, with the average American losing $1,015.</li>
+                <li>$14 billion in late fees charged by credit card issuers in 2022, over 10% of total interest and fees.</li>
+            </ul>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown("---")
+
+    # Add sidebar
+    with st.sidebar:
+        st.title("Immi App")
+        st.markdown("### Personal Finance App")
+
+        st.markdown("---")
+
+        if st.button("📚 Immi App", use_container_width=True, key="sidebar_fin_lit"):
+            logging.info("Sidebar button 'Immi App' clicked.")
+            st.session_state.current_section = "Immi App"
+            st.rerun()
+
+
+        st.markdown("---")
+
+        # Add logout button at the bottom of sidebar
+        st.markdown(
+            """
+            <style>
+            [data-testid="stSidebarNav"] {
+                background-image: linear-gradient(#4B8BBE, #3D7BA8);
+                color: white;
+                padding: 1rem;
+                margin-top: auto;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
+        if st.button("🚪 Logout", key="sidebar_logout"):
+            logging.info("Sidebar logout button clicked, logging out user and navigating to landing page")
+            st.session_state.clear()
+            st.session_state.page = "login"
+            st.rerun()
+
+    # Initialize session state for current section if not exists
+    if "current_section" not in st.session_state:
+        st.session_state.current_section = "immi"
+
+    # Initialize chat histories if not exists
+    init_messages()
+
+    # Main content area with separate chat interfaces
+    if st.session_state.current_section == "immi":
+        st.header("📚 Financial Literacy")
+        st.markdown(
+            """
+        Welcome to your Immigration hub! Here you can:
+
+        """
+        )
+        # Financial Literacy Chat Interface
+        display_chat_interface("fin_lit", "Ask about financial concepts...")
+
+
+    # Initialize session state variables if not set
+    init_service_metadata()
+    init_config_options()
+    init_messages()
+
+    # Define icons for the chat messages
+    icons = {"assistant": "❄️", "user": "👤"}
+
+    # Display chat messages from history on app rerun
+    if "messages" in st.session_state and st.session_state.messages:
+        for message in st.session_state.messages:
+            with st.chat_message(message["role"], avatar=icons[message["role"]]):
+                st.markdown(message["content"])
+
+
+def display_chat_interface(feature_key, placeholder_text):
+    """
+    Display a chat interface for a specific feature.
+    """
+    # Get feature-specific messages
+    if feature_key == "immi":
+        messages = st.session_state.fin_lit_messages
+
+
+    # Chat input
+    if question := st.chat_input(placeholder_text):
+        # Display user message
+        with st.chat_message("user", avatar=icons["user"]):
+            st.markdown(question.replace("$", "\$"))
+
+        # Add to feature-specific history
+        if feature_key == "immi":
+            st.session_state.fin_lit_messages.append({"role": "user", "content": question})
+
+        # Generate response
+        with st.chat_message("assistant", avatar=icons["assistant"]):
+            message_placeholder = st.empty()
+            try:
+                prompt, results = create_prompt(question)
+                with st.spinner("Thinking..."):
+                    generated_response = complete(
+                        MODEL_NAME,
+                        prompt,
+                        session=st.session_state.session,
+                    )
+
+                    # Add citations if available
+                    if results:
+                        markdown_table = "###### References \n\n| Content |\n|--------|\n"
+                        for result in results:
+                            if isinstance(result, dict) and "CHUNK" in result:
+                                chunk = result["CHUNK"]
+                            elif isinstance(result, (list, tuple)) and len(result) > 0:
+                                chunk = str(result[0])
+                            else:
+                                continue
+                            markdown_table += f"| {chunk} |\n"
+                        generated_response += "\n\n" + markdown_table
+
+                    message_placeholder.markdown(generated_response)
+
+                    # Add to feature-specific history
+                    if feature_key == "immi":
+                        st.session_state.fin_lit_messages.append({"role": "assistant", "content": generated_response})
+                   
+
+            except Exception as e:
+                error_msg = "An error occurred while processing your request."
+                message_placeholder.markdown(error_msg)
+                logging.error(f"Error during chat completion: {e}")
 
 
 def init_messages():
     """
-    Initialize the session state for chat messages. If the session state indicates that the
-    conversation should be cleared or if the "messages" key is not in the session state,
-    initialize it as an empty list.
+    Initialize the chat messages in the session state.
     """
-    if st.session_state.clear_conversation or "messages" not in st.session_state:
+    if "messages" not in st.session_state:
         st.session_state.messages = []
 
-
-def init_service_metadata():
-    """
-    Initialize the session state for cortex search service metadata. Query the available
-    cortex search services from the Snowflake session and store their names and search
-    columns in the session state.
-    """
-    if "service_metadata" not in st.session_state:
-        session = st.session_state.session
-        services = session.sql("SHOW CORTEX SEARCH SERVICES;").collect()
-        service_metadata = []
-        if services:
-            for s in services:
-                svc_name = s["name"]
-                svc_search_col = session.sql(
-                    f"DESC CORTEX SEARCH SERVICE {svc_name};"
-                ).collect()[0]["search_column"]
-                service_metadata.append(
-                    {"name": svc_name, "search_column": svc_search_col}
-                )
-
-        st.session_state.service_metadata = service_metadata
-
-
-def init_config_options():
-    """
-    Initialize the configuration options in the Streamlit sidebar. Allow the user to select
-    a cortex search service, clear the conversation, toggle debug mode, and toggle the use of
-    chat history. Also provide advanced options to select a model, the number of context chunks,
-    and the number of chat messages to use in the chat history.
-    """
-    st.sidebar.selectbox(
-        "Select cortex search service:",
-        [s["name"] for s in st.session_state.service_metadata],
-        key="selected_cortex_search_service",
-    )
-
-    st.sidebar.button("Clear conversation", key="clear_conversation")
-    st.sidebar.toggle("Debug", key="debug", value=False)
-    st.sidebar.toggle("Use chat history", key="use_chat_history", value=True)
-
-    with st.sidebar.expander("Advanced options"):
-        st.selectbox("Select model:", MODELS, key="model_name")
-        st.number_input(
-            "Select number of context chunks",
-            value=5,
-            key="num_retrieved_chunks",
-            min_value=1,
-            max_value=10,
-        )
-        st.number_input(
-            "Select number of messages to use in chat history",
-            value=5,
-            key="num_chat_messages",
-            min_value=1,
-            max_value=10,
-        )
-
-    st.sidebar.expander("Session State").write(st.session_state)
-
-
-def query_cortex_search_service(query, columns = [], filter={}):
-    """
-    Query the selected cortex search service with the given query and retrieve context documents.
-    Display the retrieved context documents in the sidebar if debug mode is enabled. Return the
-    context documents as a string.
-
-    Args:
-        query (str): The query to search the cortex search service with.
-
-    Returns:
-        str: The concatenated string of context documents.
-    """
-    db, schema = session.get_current_database(), session.get_current_schema()
-
-    cortex_search_service = (
-        root.databases[db]
-        .schemas[schema]
-        .cortex_search_services[st.session_state.selected_cortex_search_service]
-    )
-
-    context_documents = cortex_search_service.search(
-        query, columns=columns, filter=filter, limit=st.session_state.num_retrieved_chunks
-    )
-    results = context_documents.results
-
-    service_metadata = st.session_state.service_metadata
-    search_col = [s["search_column"] for s in service_metadata
-                    if s["name"] == st.session_state.selected_cortex_search_service][0].lower()
-
-    context_str = ""
-    for i, r in enumerate(results):
-        context_str += f"Context document {i+1}: {r[search_col]} \n" + "\n"
-
-    if st.session_state.debug:
-        st.sidebar.text_area("Context documents", context_str, height=500)
-
-    return context_str, results
+    # Initialize feature-specific message histories
+    if "fin_lit_messages" not in st.session_state:
+        st.session_state.fin_lit_messages = []
+    if "investment_messages" not in st.session_state:
+        st.session_state.investment_messages = []
+    if "ai_agent_messages" not in st.session_state:
+        st.session_state.ai_agent_messages = []
 
 
 def get_chat_history():
     """
-    Retrieve the chat history from the session state limited to the number of messages specified
-    by the user in the sidebar options.
-
-    Returns:
-        list: The list of chat messages from the session state.
+    Retrieve the chat history from the session state based on current section.
     """
-    start_index = max(
-        0, len(st.session_state.messages) - st.session_state.num_chat_messages
-    )
-    return st.session_state.messages[start_index : len(st.session_state.messages) - 1]
+    if "current_section" not in st.session_state:
+        return []
+
+    section = st.session_state.current_section
+    if section == "financial_literacy":
+        messages = st.session_state.fin_lit_messages
+    elif section == "investment":
+        messages = st.session_state.investment_messages
+    else:  # ai_agents
+        messages = st.session_state.ai_agent_messages
+
+    num_messages = st.session_state.num_chat_messages
+    return messages[-num_messages:] if messages else []
 
 
-def complete(model, prompt):
+def create_prompt(user_question):
     """
-    Generate a completion for the given prompt using the specified model.
-
-    Args:
-        model (str): The name of the model to use for completion.
-        prompt (str): The prompt to generate a completion for.
-
-    Returns:
-        str: The generated completion.
+    Create a prompt for the chatbot based on the user's question and chat history.
     """
-    return Complete(model, prompt).replace("$", "\$")
+    logging.info(f"Creating prompt with user question: {user_question}")
+
+    # Get section-specific chat history
+    chat_history = get_chat_history()
+    section = st.session_state.current_section
+
+    # Get the appropriate base prompt 
+    base_prompt = st.secrets["base_prompts"].get(section, st.secrets["base_prompts"][section])
+
+    if st.session_state.use_chat_history and chat_history:
+        # Create context-aware prompt
+        question_summary = make_chat_history_summary(chat_history, user_question)
+        prompt_context, results = query_cortex_search_service(question_summary, columns=["CHUNK"], filter={})
+    else:
+        # Create standalone prompt
+        prompt_context, results = query_cortex_search_service(user_question, columns=["CHUNK"], filter={})
+
+    # Combine into final prompt
+    final_prompt = f"""[INST]
+    {base_prompt}
+
+    <chat_history>
+    {chat_history if chat_history else "No previous context"}
+    </chat_history>
+
+    <context>
+    {prompt_context}
+    </context>
+
+    <question>
+    {user_question}
+    </question>
+    [/INST]
+    """
+
+    return final_prompt, results
+
+
+def init_service_metadata():
+    """
+    Initialize service metadata for the Snowflake Cortex search services.
+    """
+    logging.info("Initializing service metadata.")
+    if "service_metadata" not in st.session_state:
+        st.session_state.service_metadata = []
+
+        # Define EDU_SERVICE metadata
+        immi_service = {
+            "name": "IMMI_SERVICE",
+            "description": "Financial education and literacy content",
+            "model": "mistral-large2",
+            "search_column": "CHUNK",
+        }
+
+
+        st.session_state.service_metadata = [immi_service]
+        logging.info(f"Service metadata initialized")
+
+        # Set default service based on current section
+        if "current_section" in st.session_state:
+            if st.session_state.current_section == "immi":
+                st.session_state.selected_cortex_search_service = "imm_service"
+    else:
+        logging.info("Service metadata already present in session state.")
+
+
+def init_config_options():
+    """
+    Initialize the configuration options for the Streamlit application.
+    """
+    logging.info("Initializing config options.")
+
+    # Set the model name and service based on current section
+    if "current_section" in st.session_state:
+        if st.session_state.current_section == "financial_literacy":
+            st.session_state.selected_cortex_search_service = "EDU_SERVICE"
+        else:  # investment or ai_agents
+            st.session_state.selected_cortex_search_service = "FIN_SERVICE"
+    else:
+        st.session_state.selected_cortex_search_service = "EDU_SERVICE"
+
+    # Always use mistral-large2 model
+    st.session_state.model_name = MODEL_NAME
+
+    # Initialize other config options if not already set
+    if "use_chat_history" not in st.session_state:
+        st.session_state.use_chat_history = True
+    if "num_retrieved_chunks" not in st.session_state:
+        st.session_state.num_retrieved_chunks = 5
+    if "num_chat_messages" not in st.session_state:
+        st.session_state.num_chat_messages = 5
+
+    logging.info("Config options initialized successfully.")
+
+
+def query_cortex_search_service(query, columns=[], filter={}):
+    """
+    Perform a search query on the selected Cortex search service.
+    """
+    logging.info(f"Querying cortex search service with query: {query}")
+    try:
+        if not hasattr(st.session_state, "cortex_search_service"):
+            logging.error("search service not initialized")
+            return "", []
+
+        cortex_search_service = st.session_state.cortex_search_services[st.session_state.selected_cortex_search_service]
+
+        # Query the search service
+        search_response = cortex_search_service.search(
+            query,
+            columns=["CHUNK"],
+            limit=st.session_state.num_retrieved_chunks,
+        )
+
+        if not search_response or not hasattr(search_response, "results"):
+            logging.warning("No search results found")
+            return "", []
+
+        # Extract chunks from results
+        results = search_response.results
+        chunks = []
+        for result in results:
+            if isinstance(result, dict) and "CHUNK" in result:
+                chunks.append(result["CHUNK"])
+            elif isinstance(result, (list, tuple)) and len(result) > 0:
+                # If result is a sequence, take the first element as CHUNK
+                chunks.append(str(result[0]))
+            else:
+                logging.warning(f"Unexpected result format: {type(result)}")
+                continue
+
+        # Create context string
+        context = "\n".join(chunks) if chunks else ""
+
+        logging.info(f"Found {len(chunks)} context documents")
+        return context, results
+
+    except Exception as e:
+        logging.error(f"Error querying cortex search service: {e}")
+        return "", []
+
+
+def complete(model, prompt, session=None):
+    """
+    Generate a completion response using the specified model and prompt.
+    """
+    logging.info(f"Generating completion with model: {model}")
+    try:
+        response = Complete(model, prompt, session=session).replace("$", "\$")
+        logging.info("Completion generated successfully.")
+        return response
+    except Exception as e:
+        logging.error(f"Error during completion: {e}")
+        st.error("An error occurred during completion. Check logs.")
+        return "An error occurred."
 
 
 def make_chat_history_summary(chat_history, question):
     """
-    Generate a summary of the chat history combined with the current question to extend the query
-    context. Use the language model to generate this summary.
-
-    Args:
-        chat_history (str): The chat history to include in the summary.
-        question (str): The current user question to extend with the chat history.
-
-    Returns:
-        str: The generated summary of the chat history and question.
+    Create a prompt to generate a query based on chat history and the current question.
     """
+    logging.info("Creating chat history summary prompt.")
     prompt = f"""
         [INST]
         Based on the chat history below and the question, generate a query that extend the question
@@ -204,130 +493,277 @@ def make_chat_history_summary(chat_history, question):
         </question>
         [/INST]
     """
-
-    summary = complete(st.session_state.model_name, prompt)
-
-    if st.session_state.debug:
-        st.sidebar.text_area(
-            "Chat history summary", summary.replace("$", "\$"), height=150
-        )
-
-    return summary
+    logging.info("Chat history summary prompt created, using LLM to process")
+    return complete(st.session_state.model_name, prompt, session=st.session_state.session)
 
 
-def create_prompt(user_question):
+def landing_page():
     """
-    Create a prompt for the language model by combining the user question with context retrieved
-    from the cortex search service and chat history (if enabled). Format the prompt according to
-    the expected input format of the model.
-
-    Args:
-        user_question (str): The user's question to generate a prompt for.
-
-    Returns:
-        str: The generated prompt for the language model.
+    Landing page of the Streamlit application that introduces the app and its features.
     """
-    if st.session_state.use_chat_history:
-        chat_history = get_chat_history()
-        if chat_history != []:
-            question_summary = make_chat_history_summary(chat_history, user_question)
-            prompt_context, results = query_cortex_search_service(
-                question_summary,
-                columns=["chunk", "file_url", "relative_path"],
-                filter={"@and": [{"@eq": {"language": "English"}}]},
-            )
-        else:
-            prompt_context, results = query_cortex_search_service(
-                user_question,
-                columns=["chunk", "file_url", "relative_path"],
-                filter={"@and": [{"@eq": {"language": "English"}}]},
-            )
-    else:
-        prompt_context, results = query_cortex_search_service(
-            user_question,
-            columns=["chunk", "file_url", "relative_path"],
-            filter={"@and": [{"@eq": {"language": "English"}}]},
-        )
-        chat_history = ""
+    logging.info("Displaying landing page.")
+    # Set up the page layout
 
-    prompt = f"""
-            [INST]
-            You are a helpful AI chat assistant with RAG capabilities. When a user asks you a question,
-            you will also be given context provided between <context> and </context> tags. Use that context
-            with the user's chat history provided in the between <chat_history> and </chat_history> tags
-            to provide a summary that addresses the user's question. Ensure the answer is coherent, concise,
-            and directly relevant to the user's question.
-
-            If the user asks a generic question which cannot be answered with the given context or chat_history,
-            just say "I don't know the answer to that question.
-
-            Don't saying things like "according to the provided context".
-
-            <chat_history>
-            {chat_history}
-            </chat_history>
-            <context>
-            {prompt_context}
-            </context>
-            <question>
-            {user_question}
-            </question>
-            [/INST]
-            Answer:
-            """
-    return prompt, results
-
-
-def main():
-    st.title(f":speech_balloon: Chatbot with Snowflake Cortex")
-
-    # Initialize Snowflake session first
-    session = initialize_session()
-    if session is None:
-        st.error("Cannot proceed without a valid Snowflake session. Please check your credentials in .streamlit/secrets.toml")
-        return
-    
-    # Then initialize other components
-    init_service_metadata()
-    init_config_options()
-    init_messages()
-
-    icons = {"assistant": "❄️", "user": "👤"}
-
-    # Display chat messages from history on app rerun
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"], avatar=icons[message["role"]]):
-            st.markdown(message["content"])
-
-    disable_chat = (
-        "service_metadata" not in st.session_state
-        or len(st.session_state.service_metadata) == 0
+    # Custom CSS for styling (without hardcoding colors)
+    st.markdown(
+        """
+        <style>
+            /* Center align text and buttons */
+            .stButton>button {
+                width: 100%;
+                margin-top: 1rem;
+                font-weight: bold;
+                border-radius: 0.5rem;
+                padding: 0.5rem 1rem;
+            }
+            /* Hide Streamlit branding */
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+            header {visibility: hidden;}
+            /* Add spacing between sections */
+            .section {
+                margin-bottom: 2rem;
+            }
+            /* Custom font size for headers */
+            h1 {
+                font-size: 2.5rem;
+                text-align: center;
+            }
+            h2 {
+                font-size: 1.8rem;
+                margin-bottom: 1rem;
+            }
+            h3 {
+                font-size: 1.5rem;
+                margin-bottom: 0.5rem;
+            }
+            p {
+                font-size: 1.1rem;
+                line-height: 1.6;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
     )
-    if question := st.chat_input("Ask a question...", disabled=disable_chat):
-        # Add user message to chat history
-        st.session_state.messages.append({"role": "user", "content": question})
-        # Display user message in chat message container
-        with st.chat_message("user", avatar=icons["user"]):
-            st.markdown(question.replace("$", "\$"))
 
-        # Display assistant response in chat message container
-        with st.chat_message("assistant", avatar=icons["assistant"]):
-            message_placeholder = st.empty()
-            question = question.replace("'", "")
-            prompt, results = create_prompt(question)
-            with st.spinner("Thinking..."):
-                generated_response = complete(
-                    st.session_state.model_name, prompt
-                )
-                # build references table for citation
-                markdown_table = "###### References \n\n| PDF Title | URL |\n|-------|-----|\n"
-                for ref in results:
-                    markdown_table += f"| {ref['relative_path']} | [Link]({ref['file_url']}) |\n"
-                message_placeholder.markdown(generated_response + "\n\n" + markdown_table)
+    # Landing page header
+    st.markdown(
+        """
+        <style>
+            .landing-header {
+                text-align: center;
+                padding: 2rem 0;
+            }
+            .welcome-stats {
+                padding: 1rem;
+                border-radius: 10px;
+                background-color: #FFFFFF;
+                margin: 1rem 0;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
 
-        st.session_state.messages.append(
-            {"role": "assistant", "content": generated_response}
-        )
+    # Landing page header
+    st.markdown(
+        """
+        <div class='landing-header'>
+            <h1>Welcome to Econo Genie <span style='font-size: 1.5rem;'>🧞‍♂️</span></h1>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # Navigation Bar
+    col1, col2, col3, col4, col5 = st.columns([4, 2, 2, 2, 2])
+    with col1:
+        st.markdown("### Econo Genie 🧞‍♂️", unsafe_allow_html=True)
+    with col3:
+        if st.button("Home", key="nav_home_btn", use_container_width=True):
+            logging.info("Landing page button 'Home' clicked.")
+            st.session_state.page = "landing"
+            st.rerun()
+    with col4:
+        if st.button("Login", key="nav_login_btn", use_container_width=True):
+            logging.info("Landing page button 'Login' clicked.")
+            st.session_state.page = "login"
+            st.rerun()
+    with col5:
+        if st.button("Sign Up", key="nav_signup_btn", use_container_width=True):
+            logging.info("Landing page button 'Sign Up' clicked.")
+            st.session_state.page = "signup"
+            st.rerun()
+
+    st.markdown("---")
+
+    # Custom CSS for landing page buttons
+    st.markdown(
+        """
+        <style>
+            .stButton>button {
+                font-size: 16px;
+                padding: 2px 10px;
+                border-radius: 4px;
+                height: 35px;
+                width: 100%;
+                margin: 0;
+            }
+            .button-col {
+                display: flex;
+                justify-content: center;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+    # welcome message
+    st.markdown(
+        """
+        <div class='welcome-stats'>
+            <p style='font-size: 1.1rem; color: #A18249; margin-bottom: 1rem;'>
+                <strong>Did you know? <span style='font-size: 1.5rem;'>🧞‍♂️</span></strong>
+            </p>
+            <ul style='color: #1C160C; font-size: 1.1rem; line-height: 1.6;'>
+                <li>$243 billion lost nationwide in 2024 due to financial ignorance, with the average American losing $1,015.</li>
+                <li>$14 billion in late fees charged by credit card issuers in 2022, over 10% of total interest and fees.</li>
+            </ul>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown("---")
+
+    # Personalized Investment Recommendations Section
+    st.markdown("## Personalized Investment Recommendations")
+    st.markdown(
+        """
+        **Tailored advice based on your financial profile.**
+
+        We offer a wide range of investments, including stocks, bonds, mutual funds, and more.
+        """
+    )
+    col1, col2, col3 = st.columns([12, 5, 4])
+    with col2:
+        if st.button("Start now", key="start_investment", use_container_width=True):
+            logging.info("Landing page button 'Start now' (invest) clicked.")
+            st.session_state.page = "signup"
+            st.rerun()
+
+    st.markdown("---")
+
+    # Financial Literacy Section
+    st.markdown("## Financial Literacy")
+    st.markdown(
+        """
+        **Assessment, progress tracking, and suggestions on what to learn next.**
+
+        We offer a wide range of resources, including articles, videos, and quizzes.
+        """
+    )
+    col1, col2, col3 = st.columns([12, 5, 4])
+    with col2:
+        if st.button("Explore now", key="explore_financial_literacy", use_container_width=True):
+            logging.info("Landing page button 'Explore now' (fin lit) clicked.")
+            st.session_state.page = "signup"
+            st.rerun()
+
+    st.markdown("---")
+
+    # AI Agents Section
+    st.markdown("## AI Agents [Work in Progress]")
+    st.markdown(
+        """
+        **The AI Financial Assistant is like having a smart, friendly money coach in your pocket.**
+
+        It's designed to make managing your day-to-day finances simple, stress-free, and even fun.
+        """
+    )
+    col1, col2, col3 = st.columns([12, 5, 4])
+    with col2:
+        if st.button("Explore now", key="explore_ai_agents", use_container_width=True):
+            logging.info("Landing page button 'Explore now' (AI) clicked.")
+            st.session_state.page = "signup"
+            st.rerun()
+
+    st.markdown("---")
+    # Custom CSS for styling
+    st.markdown(
+        """
+        <style>
+            /* Center align text and buttons */
+            .stButton>button {
+                width: 100%;
+                margin-top: 1rem;
+                background-color: #4B8BBE;
+                color: white;
+                font-weight: bold;
+                border-radius: 0.5rem;
+                padding: 0.5rem 1rem;
+            }
+            .stButton>button:hover {
+                background-color: #306998;
+            }
+            /* Hide Streamlit branding */
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+            header {visibility: hidden;}
+            /* Add spacing between sections */
+            .section {
+                margin-bottom: 2rem;
+            }
+            /* Custom font size for headers */
+            h1 {
+                font-size: 2.5rem;
+                text-align: center;
+            }
+            h2 {
+                font-size: 1.8rem;
+                margin-bottom: 1rem;
+            }
+            h3 {
+                font-size: 1.5rem;
+                margin-bottom: 0.5rem;
+            }
+            p {
+                font-size: 1.1rem;
+                line-height: 1.6;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+# Main function to handle page flow
+def main():
+    """
+    Main function to handle the page flow of the Streamlit application.
+    """
+    logging.info("Starting the application.")
+    if "page" not in st.session_state:
+        st.session_state.page = "login"
+        logging.info("No page found in session state, defaulting to landing page.")
+
+    # Initialize session here
+    if "session" not in st.session_state:
+        session = initialize_session()
+        if not session:
+            return  # Stop if session cannot be initialized
+
+    if st.session_state.page == "login":
+        logging.info("Displaying login page.")
+        login_page(st, st.secrets["cred"]["email"], st.secrets["cred"]["password"])
+    elif st.session_state.page == "signup":
+        logging.info("Displaying signup page.")
+        signup_page(st)
+    else:
+        # Corrected the multiple logging of the main page by checking if the page has changed in session.
+        if "previous_page" not in st.session_state or st.session_state.previous_page != "main":
+            logging.info("Displaying main page.")
+            st.session_state.previous_page = "main"  # Setting the previous page to main to avoid multiple logging.
+        main_page()
 
 
 if __name__ == "__main__":

@@ -187,7 +187,7 @@ vertical-ai-agent-for-personal-finance/
 ### Quick Start
 ```bash
 # Clone repository
-git clone https://github.com/tula8891/Demo_app.git
+git clone https://github.com/tula8891/vertical-ai-agent-for-personal-finance.git
 cd Demo_app
 
 # Install dependencies

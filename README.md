@@ -165,7 +165,7 @@ We empower individuals to master their finances through an autonomous AI agent t
 
 ## Project Structure
 ```
-Demo_app/
+vertical-ai-agent-for-personal-finance/
 ├── .github/            # GitHub Actions workflows
 ├── .streamlit/         # Streamlit configuration
 ├── tests/             # Test suite

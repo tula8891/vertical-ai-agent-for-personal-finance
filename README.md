@@ -1,10 +1,29 @@
 # ECONOGENIE: Personal Finance BRO
 
+Developed and Designed By:
+
+Parmanand Sahu :   https://parmanandsahu.com/
+
+Tula Ram Sahu :    https://in.linkedin.com/in/tula-ram-sahu-003226104
+
+Website_url:   https://econogenie.streamlit.app/
+
+trulense_dashboard: https://evaluationdashboardpy-k8zboht9zpanqfkwnwkgec.streamlit.app/
+
+-------
+### Note
+
+This is not open source project.
+
+We would like to inform you that the GitHub repository associated with the Snowflake-Mistral-RAG DevPost Challenge (https://snowflake-mistral-rag.devpost.com/) is restricted for use by judges only.
+
+This means that no one apart from the designated judges is permitted to access, clone, fork, or use the repository for any purpose.
+
 ## Overview
 
 An autonomous AI agent crafted to help users master their finances with minimal human intervention, while maintaining transparent decision-making and keeping the human decision-maker firmly in the loop.
 
-## Facts about Financial
+## Facts
 1. In 2024, $243 billion was lost countrywide of the average American losing $1,015 owing to ignorance of finance.
 2. In 2022, credit card issuers charged over $14 billion in late fees alone, which represented more than 10% of the $130 billion they charged in total interest and fees.
 
@@ -246,39 +265,40 @@ Example: make release VERSION=1.7.1  # Create release with specific version
 5. Updated test coverage
 
 
-## License
-MIT License - see [LICENSE](LICENSE) for details.
-
 ## Acknowledgments
 - Snowflake Team
 - TruLens Team
 - Streamlit Team
 - DevPost Team
 
-## Frequently Asked Questions (FAQ)
+## Sample Questions for users of EconoGenie
 
-### 1. **What is the company’s market share in its industry?**
-
-**Use Case**:
-When analyzing a company, an investor might want to understand how much of the market the company controls compared to its competitors. For example, if you’re considering investing in a tech company, knowing its market share in the AI chip sector (like NVIDIA's) could give you a sense of its industry dominance.
-
-
-### 2. **How is the company adapting to changes in its industry (e.g., new technology, regulatory changes)?**
+### 1. **How much should I save each month to achieve my financial goals?**
 
 **Use Case**:
-Imagine you’re reviewing a company in the electric vehicle (EV) industry. You might want to know how the company is responding to new regulations around emissions or adopting new battery technologies to stay competitive.
+Determining how much to save each month to achieve your financial goals involves a few key steps. First, clearly define your financial goals, whether they are short-term, like saving for a vacation, or long-term, such as retirement or buying a house. Next, estimate the total cost of each goal and the timeframe in which you want to achieve them. For example, if you want to save for a vacation that costs $2,000 and you plan to go in a year, you'll need to save about $167 each month.
+
+Once you have a clear picture of your goals, create a budget to understand your income and expenses. Identify areas where you can cut back to free up more money for savings. A common guideline is the 50/30/20 rule, which suggests allocating 50% of your income to necessities, 30% to wants, and 20% to savings and debt repayment. However, you can adjust these percentages based on your specific needs and goals.
+
+
+### 2. **How do I pay off debt faster and minimize interest?**
+
+**Use Case**:
+Paying off debt faster and minimizing interest are crucial steps towards improving your financial health. To achieve this, start by understanding your debt. List all your debts, including the creditor, total amount owed, interest rate, and minimum payment. Prioritize your debts based on their interest rates, as those with higher rates are costing you the most money. Next, create a budget by tracking your income and expenses to identify areas where you can cut back and allocate extra money towards debt repayment.
+
+One effective strategy is to pay more than the minimum required payment. This can significantly reduce the time it takes to pay off your debt and the total interest you pay. For example, if you have a $10,000 credit card debt with a 15% interest rate and a minimum payment of $200, paying an extra $100 each month can save you thousands in interest and shave years off your repayment time.
 
 
 ### 3. **Is the company targeting emerging markets for growth?**
 
 **Use Case**:
-If you're looking into a company like Coca-Cola, you might want to understand if they’re planning to expand into emerging markets like Africa or Southeast Asia. This could help you assess their potential for future revenue growth.
+To determine if a company is targeting emerging markets for growth, you should review its strategic plans, recent announcements, and financial reports. Look for mentions of expansion into regions like Asia, Africa, or Latin America, as well as investments in local infrastructure, partnerships, or product launches tailored to these markets. This information will indicate the company's focus on emerging markets for future growth.
 
 
 ### 4. **What are the risks that the company faces from industry competition?**
 
 **Use Case**:
-Consider an investor researching a software company. They may want to know if the company is at risk of being overtaken by a new startup offering innovative solutions or if the company has barriers to entry that protect it.
+When evaluating the risks a company faces from industry competition, several key factors come into play. These include market share erosion, pricing pressure, innovation and technological advancements, customer loyalty and brand reputation, supply chain disruptions, regulatory changes, talent attraction and retention, market saturation, mergers and acquisitions, and geographic expansion. To mitigate these risks, the company can adopt strategies such as continuous innovation, a customer-centric approach, strategic partnerships, cost management, brand building, talent management, regulatory compliance, and diversification. Investing in any company involves risks, and the impact of industry competition is just one of many factors to consider. Investors should carefully review the company's financial statements, annual reports, and other disclosures to understand the full range of risks and make informed investment decisions.
 
 
 ### 5. **How does the company plan to stay competitive in its industry over the next 3-5 years?**
